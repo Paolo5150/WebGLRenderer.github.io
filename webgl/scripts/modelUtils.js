@@ -78,9 +78,8 @@ async function loadOBJ(pathToFile)
                 }
 
             let mm = new Mesh(allVertex, allIndex)
-            let mr = new MeshRenderer(mm, shaderProgram)
 
-            resolve(mr)
+            resolve(mm)
             }
 
             

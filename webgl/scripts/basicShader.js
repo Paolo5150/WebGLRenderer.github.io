@@ -51,7 +51,6 @@ function getBasicFragment() {
 
 
     uniform sampler2D uSampler_1;
-    uniform sampler2D uSampler_2;
 
     void main(void) 
     {
@@ -65,7 +64,6 @@ function getBasicFragment() {
         highp vec3 specular = spec * vec3(1,1,1);
 
         highp vec3 text = texture2D(uSampler_1, fUv).rgb;
-        highp vec3 text2 = texture2D(uSampler_2, fUv).rgb;
 
         highp vec3 finalColor = text * (dLight + specular);
         gl_FragColor = vec4(finalColor,1);

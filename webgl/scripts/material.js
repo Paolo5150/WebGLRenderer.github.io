@@ -9,8 +9,7 @@ class Material {
 
     addTexture(uniformName, textureID) {
 
-        var textureLocation = gl.getUniformLocation(this.shader, uniformName);
-        gl.uniform1i(textureLocation, Object.keys(this.textures).length);
+        
         this.textures[uniformName] = textureID
 
 
@@ -18,8 +17,12 @@ class Material {
 
     bind() {
 
-
+        gl.useProgram(this.shader);
+        
         for(var i=0; i< Object.keys(this.textures).length; i++) {
+
+            var textureLocation = gl.getUniformLocation(this.shader, Object.keys(this.textures)[i]);
+            gl.uniform1i(textureLocation, i);
 
             gl.activeTexture(gl.TEXTURE0 + i);
             var key = Object.keys(this.textures)[i]
