@@ -90,4 +90,42 @@ async function loadOBJ(pathToFile)
     
 }
 
+function getQuadMesh() {
+
+    let v1 = new Vertex(-0.5,-0.5,0.0)
+    v1.normal[0] = 0
+    v1.normal[1] = 0
+    v1.normal[2] = 1
+    v1.uv[0] = 0
+    v1.uv[1] = 0
+
+    let v2 = new Vertex(0.5,-0.5,0.0)
+    v2.normal[0] = 0
+    v2.normal[1] = 0
+    v2.normal[2] = 1
+    v2.uv[0] = 1
+    v2.uv[1] = 0
+
+    let v3 = new Vertex(0.5,0.5,0.0)
+    v3.normal[0] = 0
+    v3.normal[1] = 0
+    v3.normal[2] = 1
+    v3.uv[0] = 1
+    v3.uv[1] = 1
+
+    let v4 = new Vertex(-0.5,0.5,0.0)
+    v4.normal[0] = 0
+    v4.normal[1] = 0
+    v4.normal[2] = 1
+    v4.uv[0] = 0
+    v4.uv[1] = 1
+
+    var vs = [v1,v2,v3,v4]
+
+    var is = [0,1,2,2,3,0]
+
+    let mesh = new Mesh(vs,is)
+    return mesh
+}
+
 

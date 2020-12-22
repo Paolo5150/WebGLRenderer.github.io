@@ -4,6 +4,7 @@ class Material {
 
         this.shader = shader
         this.textures = []
+        this.onPreRender = ()=>{}
 
     }
 
@@ -28,9 +29,9 @@ class Material {
             var key = Object.keys(this.textures)[i]
             this.textures[key].bind()
 
-
-
         }
+
+        this.onPreRender()
         
 
     }

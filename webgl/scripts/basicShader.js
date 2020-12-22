@@ -2,7 +2,6 @@ function getBasicVertex() {
 
     return `
 
-
     attribute vec3 position;
     attribute vec3 color;
     attribute vec2 uv;
