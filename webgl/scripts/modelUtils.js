@@ -4,7 +4,6 @@ async function loadOBJ(pathToFile)
     return new Promise((resolve, reject) => {
         OBJLoader.load(pathToFile, function (wolf){
 
-            console.log(wolf)
             var group = wolf.groups[Object.keys(wolf.groups)[0]];
             var faces = group.faces
             
