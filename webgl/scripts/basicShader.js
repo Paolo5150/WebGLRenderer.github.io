@@ -1,19 +1,19 @@
 function getBasicVertex() {
 
-    return `
+    return `#version 300 es
 
-    attribute vec3 position;
-    attribute vec3 color;
-    attribute vec2 uv;
-    attribute vec3 normal;
+    in vec3 position;
+    in vec3 color;
+    in vec2 uv;
+    in vec3 normal;
 
-    varying lowp vec3 fColor;
-    varying highp vec3 fNormal;
-    varying highp  vec2 fUv;
+    out vec3 fColor;
+    out vec3 fNormal;
+    out vec2 fUv;
 
-    varying highp vec3 fDirLight;
-    varying highp vec3 fCamPos;
-    varying highp vec3 fFragPos;
+    out vec3 fDirLight;
+    out vec3 fCamPos;
+    out vec3 fFragPos;
 
     uniform vec3 dirLight;
     uniform vec3 camPos;
@@ -21,9 +21,9 @@ function getBasicVertex() {
     uniform mat4 model;
     uniform mat4 perspective;
 
-    void main(void) 
+    void main() 
     { 
-        highp vec4 fragPos = model * vec4(position, 1.0);
+        vec4 fragPos = model * vec4(position, 1.0);
         gl_Position = perspective * fragPos;
 
         fColor = color;
@@ -39,33 +39,35 @@ function getBasicVertex() {
 
 function getBasicFragment() {
 
-    return `
-    varying lowp vec3 fColor;
-    varying highp  vec2 fUv;
-    varying highp vec3 fNormal;
+    return `#version 300 es
+    precision highp float;
 
-    varying highp vec3 fDirLight;
-    varying highp vec3 fCamPos;
-    varying highp vec3 fFragPos;
+    in vec3 fColor;
+    in vec3 fNormal;
+    in vec2 fUv;
 
+    in vec3 fDirLight;
+    in vec3 fCamPos;
+    in vec3 fFragPos;
 
     uniform sampler2D uSampler_1;
+    out vec4 myOutputColor;
 
-    void main(void) 
+    void main() 
     {
-        highp float dirLightFactor = max(0.0,dot(normalize(fNormal), -fDirLight));
-        highp vec3 dLight = vec3(1,1,1) * dirLightFactor;
+        float dirLightFactor = max(0.0,dot(normalize(fNormal), -fDirLight));
+        vec3 dLight = vec3(1,1,1) * dirLightFactor;
 
 
-        highp vec3 viewDir = normalize(fCamPos - fFragPos);
-        highp vec3 reflectDir = reflect(fDirLight, fNormal);
-        highp float spec = pow(max(dot(viewDir, reflectDir), 0.0), 6.0);
-        highp vec3 specular = spec * vec3(1,1,1);
+        vec3 viewDir = normalize(fCamPos - fFragPos);
+        vec3 reflectDir = reflect(fDirLight, fNormal);
+        float spec = pow(max(dot(viewDir, reflectDir), 0.0), 6.0);
+        vec3 specular = spec * vec3(1,1,1);
 
-        highp vec3 text = texture2D(uSampler_1, fUv).rgb;
+        vec3 text = texture(uSampler_1, fUv).rgb;
 
-        highp vec3 finalColor = text * (dLight + specular);
-        gl_FragColor = vec4(finalColor,1);
+        vec3 finalColor = text * (dLight + specular);
+        myOutputColor = vec4(finalColor,1);
     }
     
     `

@@ -8,13 +8,20 @@ class Framebuffer {
     }
 
 
-    addColorAttachment(width, height) {
+    addColorAttachment(width, height, count) {
       gl.bindFramebuffer(gl.FRAMEBUFFER, this.frameBuffer)
 
-      var id = "color" + Object.keys(this.attachments).length
-      var t = Texture.CreateEmpty(width, height)
-      gl.framebufferTexture2D(gl.FRAMEBUFFER, textureExtensions.COLOR_ATTACHMENT0_WEBGL + Object.keys(this.attachments).length, gl.TEXTURE_2D, t.textID, 0);
-      this.attachments[id] = t
+      for(var i=0; i< count; i++) {
+
+        var id = "color" + i
+        var t = Texture.CreateEmpty(width, height)
+        t.bind()
+        gl.framebufferTexture2D(gl.FRAMEBUFFER, gl.COLOR_ATTACHMENT0 + i, gl.TEXTURE_2D, t.textID, 0);
+    
+        this.attachments[id] = t
+    }
+      gl.drawBuffers( [gl.COLOR_ATTACHMENT0, gl.COLOR_ATTACHMENT1]);
+
       gl.bindFramebuffer(gl.FRAMEBUFFER, null)
 
     }
@@ -31,6 +38,8 @@ class Framebuffer {
 
     bind() {
       gl.bindFramebuffer(gl.FRAMEBUFFER, this.frameBuffer)
+     gl.drawBuffers( [gl.COLOR_ATTACHMENT0, gl.COLOR_ATTACHMENT1]);
+
     }
 
     static unbind() {

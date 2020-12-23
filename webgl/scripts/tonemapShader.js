@@ -1,18 +1,17 @@
 function getTonemapVertex() {
 
-    return `
+    return `#version 300 es
 
-    attribute vec3 position;
-    attribute vec3 color;
-    attribute vec2 uv;
-    attribute vec3 normal;
+    in vec3 position;
+    in vec3 color;
+    in vec2 uv;
+    in vec3 normal;
 
-    varying lowp vec3 fColor;
-    varying highp vec3 fNormal;
-    varying highp  vec2 fUv;
-    
+    out vec3 fColor;
+    out vec3 fNormal;
+    out vec2 fUv;    
 
-    void main(void) 
+    void main() 
     { 
         gl_Position = vec4(position.xy * 2.0, 0.0,  1.0);
         fColor = color;
@@ -24,21 +23,20 @@ function getTonemapVertex() {
 
 function getTonemapFragment() {
 
-    return `
-    #extension GL_EXT_draw_buffers : require
-
+    return `#version 300 es
     precision highp float;
 
-    varying lowp vec3 fColor;
-    varying highp vec3 fNormal;
-    varying highp  vec2 fUv;
+    in vec3 fColor;
+    in vec3 fNormal;
+    in vec2 fUv;
 
     uniform sampler2D uSampler_1;
 
+    out vec4 FragColor;
 
-    void main(void) 
+    void main() 
     {
-        gl_FragData[0] = texture2D(uSampler_1, fUv);
+        FragColor = texture(uSampler_1, fUv);
     }
     
     `

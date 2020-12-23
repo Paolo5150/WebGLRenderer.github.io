@@ -48,12 +48,12 @@ class Texture
         
         // define size and format of level 0
         const level = 0;
-        const internalFormat = gl.DEPTH_COMPONENT;
+        const internalFormat = gl.DEPTH_COMPONENT16;
         const border = 0;
-        const format = gl.DEPTH_COMPONENT;
-        const type = gl.UNSIGNED_SHORT
+        const format = gl.DEPTH_COMPONENT16;
+        const type = gl.UNSIGNED_INT
         const data = null;
-        gl.texImage2D(gl.TEXTURE_2D, level, internalFormat, widh, height, border, format, type, data);
+        gl.texImage2D(gl.TEXTURE_2D, level, internalFormat, widh, height, border, gl.DEPTH_COMPONENT, type, data);
         
         // set the filtering so we don't need mips
         gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR);
@@ -72,7 +72,7 @@ class Texture
         const internalFormat = gl.RGBA;
         const border = 0;
         const format = gl.RGBA;
-        const type = gl.UNSIGNED_BYTE;
+        const type = gl.UNSIGNED_BYTE
         const data = null;
         gl.texImage2D(gl.TEXTURE_2D, level, internalFormat, widh, height, border, format, type, data);
         

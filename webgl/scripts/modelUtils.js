@@ -1,3 +1,4 @@
+
 async function loadOBJ(pathToFile)
 {
 
@@ -89,6 +90,8 @@ async function loadOBJ(pathToFile)
       });
     
 }
+
+
 
 function getQuadMesh() {
 
