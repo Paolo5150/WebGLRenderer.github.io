@@ -61,7 +61,7 @@ function getBasicFragment() {
 
         vec3 viewDir = normalize(fCamPos - fFragPos);
         vec3 reflectDir = reflect(fDirLight, fNormal);
-        float spec = pow(max(dot(viewDir, reflectDir), 0.0), 6.0);
+        float spec = pow(max(dot(viewDir, reflectDir), 0.0), 128.0);
         vec3 specular = spec * vec3(1,1,1);
 
         vec3 text = texture(uSampler_1, fUv).rgb;

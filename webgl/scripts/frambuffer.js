@@ -7,7 +7,6 @@ class Framebuffer {
 
     }
 
-
     addColorAttachment(width, height, count) {
       gl.bindFramebuffer(gl.FRAMEBUFFER, this.frameBuffer)
 
@@ -15,6 +14,25 @@ class Framebuffer {
 
         var id = "color" + i
         var t = Texture.CreateEmpty(width, height)
+        t.bind()
+        gl.framebufferTexture2D(gl.FRAMEBUFFER, gl.COLOR_ATTACHMENT0 + i, gl.TEXTURE_2D, t.textID, 0);
+    
+        this.attachments[id] = t
+    }
+      gl.drawBuffers( [gl.COLOR_ATTACHMENT0, gl.COLOR_ATTACHMENT1]);
+
+      gl.bindFramebuffer(gl.FRAMEBUFFER, null)
+
+    }
+
+
+    addColorAttachmentFloatFormat(width, height, count) {
+      gl.bindFramebuffer(gl.FRAMEBUFFER, this.frameBuffer)
+
+      for(var i=0; i< count; i++) {
+
+        var id = "color" + i
+        var t = Texture.CreateEmptyFloatFormat(width, height)
         t.bind()
         gl.framebufferTexture2D(gl.FRAMEBUFFER, gl.COLOR_ATTACHMENT0 + i, gl.TEXTURE_2D, t.textID, 0);
     

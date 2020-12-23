@@ -11,9 +11,10 @@ class Renderer
         this.allRenderers = []
     }
 
-    clear(r,g,b,a) {
+    clearAll(r,g,b,a) {
         gl.clearColor(r,g,b,a);
-        gl.clear(gl.COLOR_BUFFER_BIT);
+        gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
+        gl.clearDepth(1.0);
     }
 
     addMeshRenderer(meshRenderer)

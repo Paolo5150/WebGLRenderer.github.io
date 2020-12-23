@@ -18,7 +18,7 @@ var tonemapShader = createShaderProgram(getTonemapVertex(), getTonemapFragment()
 var deer = null
 
 var frameBuf = new Framebuffer()
-frameBuf.addColorAttachment(canvas.width, canvas.height, 1)
+frameBuf.addColorAttachmentFloatFormat(canvas.width, canvas.height, 1)
 frameBuf.addDepthAttachment(canvas.width, canvas.height)
 
 $( document ).ready(function() {
@@ -33,6 +33,14 @@ testMaterial.onPreRender = ()=>{
 
 let quadMaterial = new Material(tonemapShader)
 quadMaterial.addTexture("uSampler_1",frameBuf.attachments['color0'])
+quadMaterial.onPreRender = ()=>{
+
+    var gamma = gl.getUniformLocation(quadMaterial.shader, "gamma")
+    gl.uniform1f(gamma, 0.8);
+
+    var exp = gl.getUniformLocation(quadMaterial.shader, "exposure")
+    gl.uniform1f(exp, 2.0);
+}
 
 let quad = new MeshRenderer(getQuadMesh(), quadMaterial)
 
@@ -72,11 +80,7 @@ var render = function(time) {
     }
 
     frameBuf.bind()
-    gl.clearColor(0.0,0.0,0.0,1);
-    gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
-    gl.clearDepth(1.0);
-    gl.depthFunc(gl.LEQUAL);
-
+    renderer.clearAll(0,0,0,1)
     gl.enable(gl.DEPTH_TEST);
     renderer.render(camera,time)
     Framebuffer.unbind()

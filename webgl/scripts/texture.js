@@ -83,6 +83,27 @@ class Texture
         return t
     }
 
+    static CreateEmptyFloatFormat(widh, height) {
+        let t = new Texture()
+
+        gl.bindTexture(gl.TEXTURE_2D, t.textID);
+        
+        // define size and format of level 0
+        const level = 0;
+        const internalFormat = gl.RGBA16F;
+        const border = 0;
+        const format = gl.RGBA;
+        const type = gl.FLOAT
+        const data = null;
+        gl.texImage2D(gl.TEXTURE_2D, level, internalFormat, widh, height, border, format, type, data);
+        
+        // set the filtering so we don't need mips
+        gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR);
+        gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE);
+        gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
+        return t
+    }
+
     bind() {
 
         gl.bindTexture(gl.TEXTURE_2D, this.textID);
