@@ -29,11 +29,18 @@
     <noscript>You need to enable JavaScript to run this app.</noscript>
 
     <div>
-      <div style="position: absolute">
+      <div style="position: absolute; padding-left: 20px; top: 50px">
         <label for="lightDir" style="color: white">Light direction</label>
         <input id="dirLightX" type="number"  step = "0.1" min="-1" max="1" value="0" onchange="onLightDirectionChange('x')">
         <input id="dirLightY" type="number"  step = "0.1" min="-1" max="1" value="-1" onchange="onLightDirectionChange('y')">
         <input id="dirLightZ" type="number"  step = "0.1" min="-1" max="1" value="-1"  onchange="onLightDirectionChange('z')">
+        <br/>
+        <label for="gamma" style="color: white">Gamma</label>
+        <input id="gamma" type="number"  step = "0.1" min="0.1" max="5.0" value="0.8" onchange="onGammaChange()">
+        <br/>
+        <label for="exposure" style="color: white">Exposure</label>
+        <input id="exposure" type="number"  step = "0.1" min="0.1" max="5.0" value="0.8" onchange="onExposureChange()">
+
       </div>
 
       <canvas id = "mycanvas" width = "1920px" height="900px"></canvas>

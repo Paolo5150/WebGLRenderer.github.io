@@ -30,16 +30,15 @@ testMaterial.onPreRender = ()=>{
     gl.uniform3fv(dirLightUniform, [uiManager.lightDir[0], uiManager.lightDir[1], uiManager.lightDir[2]]);
 }
 
-
 let quadMaterial = new Material(tonemapShader)
 quadMaterial.addTexture("uSampler_1",frameBuf.attachments['color0'])
 quadMaterial.onPreRender = ()=>{
 
     var gamma = gl.getUniformLocation(quadMaterial.shader, "gamma")
-    gl.uniform1f(gamma, 0.8);
+    gl.uniform1f(gamma, uiManager.gamma);
 
     var exp = gl.getUniformLocation(quadMaterial.shader, "exposure")
-    gl.uniform1f(exp, 2.0);
+    gl.uniform1f(exp, uiManager.exposure);
 }
 
 let quad = new MeshRenderer(getQuadMesh(), quadMaterial)
