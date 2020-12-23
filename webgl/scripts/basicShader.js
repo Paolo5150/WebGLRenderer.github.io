@@ -15,7 +15,7 @@ function getBasicVertex() {
     out vec3 fCamPos;
     out vec3 fFragPos;
 
-    uniform vec3 dirLight;
+    uniform vec3 lightDirection;
     uniform vec3 camPos;
 
     uniform mat4 model;
@@ -30,7 +30,7 @@ function getBasicVertex() {
         fUv = vec2(uv.x, 1.0 - uv.y);
         fNormal = normalize((model * vec4(normal, 0.0)).xyz);
 
-        fDirLight = normalize(dirLight);
+        fDirLight = normalize(lightDirection);
         fCamPos = camPos;
         fFragPos = fragPos.xyz;
     }
@@ -50,19 +50,21 @@ function getBasicFragment() {
     in vec3 fCamPos;
     in vec3 fFragPos;
 
+    uniform vec3 lightDiffuseColor;
+    uniform vec3 lightSpecularColor;
     uniform sampler2D uSampler_1;
     out vec4 myOutputColor;
 
     void main() 
     {
         float dirLightFactor = max(0.0,dot(normalize(fNormal), -fDirLight));
-        vec3 dLight = vec3(1,1,1) * dirLightFactor;
+        vec3 dLight = lightDiffuseColor * dirLightFactor;
 
 
         vec3 viewDir = normalize(fCamPos - fFragPos);
         vec3 reflectDir = reflect(fDirLight, fNormal);
         float spec = pow(max(dot(viewDir, reflectDir), 0.0), 128.0);
-        vec3 specular = spec * vec3(1,1,1);
+        vec3 specular = spec * lightSpecularColor;
 
         vec3 text = texture(uSampler_1, fUv).rgb;
 
