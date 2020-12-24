@@ -2,7 +2,7 @@ class UIManager {
     constructor() {
 
         this.lightDir = vec3.create()
-        this.lightDir = [0,0,-1]
+        this.lightDir = [0,-1,-1]
 
         this.lightDiffuseColor = vec3.create()
         this.lightDiffuseColor = [1,1,1]
@@ -29,7 +29,6 @@ class UIManager {
 
 let uiManager = new UIManager()
 uiManager.initialize()
-
 
 function hexToRgb(hex) {
     var result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);

@@ -6,8 +6,31 @@ function getWoodMaterial() {
 
 
     let woodMaterial = new Material(basicShader)
-woodMaterial.addTexture("uSampler_1",text)
-woodMaterial.onPreRender = ()=>{
+    woodMaterial.addTexture("uSampler_1",text)
+    woodMaterial.onPreRender = ()=>{
+
+    var dirLightUniform = gl.getUniformLocation(woodMaterial.shader, "lightDirection")
+    gl.uniform3fv(dirLightUniform, [uiManager.lightDir[0], uiManager.lightDir[1], uiManager.lightDir[2]]);
+
+    var lightDifUniform = gl.getUniformLocation(woodMaterial.shader, "lightDiffuseColor")
+    gl.uniform3fv(lightDifUniform, uiManager.lightDiffuseColor);
+
+    var lightSpecUniform = gl.getUniformLocation(woodMaterial.shader, "lightSpecularColor")
+    gl.uniform3fv(lightSpecUniform, uiManager.lightSpecularColor);
+}
+
+return woodMaterial
+}
+
+function geFloorMaterial() {
+
+    var basicShader = createShaderProgram(getBasicVertex(), getBasicFragment())
+    let text = Texture.FromURL('https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcT5Y_hN950Q2m64fWpD6vyx09vHA9sgD2gbUQ&usqp=CAU')
+
+    let woodMaterial = new Material(basicShader)
+    woodMaterial.addTexture("uSampler_1",text)
+    woodMaterial.onPreRender = ()=>{
+
     var dirLightUniform = gl.getUniformLocation(woodMaterial.shader, "lightDirection")
     gl.uniform3fv(dirLightUniform, [uiManager.lightDir[0], uiManager.lightDir[1], uiManager.lightDir[2]]);
 

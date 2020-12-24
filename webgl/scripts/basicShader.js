@@ -19,12 +19,13 @@ function getBasicVertex() {
     uniform vec3 camPos;
 
     uniform mat4 model;
+    uniform mat4 view;
     uniform mat4 perspective;
 
     void main() 
     { 
         vec4 fragPos = model * vec4(position, 1.0);
-        gl_Position = perspective * fragPos;
+        gl_Position = perspective * view * fragPos;
 
         fColor = color;
         fUv = vec2(uv.x, 1.0 - uv.y);
@@ -63,7 +64,7 @@ function getBasicFragment() {
 
         vec3 viewDir = normalize(fCamPos - fFragPos);
         vec3 reflectDir = reflect(fDirLight, fNormal);
-        float spec = pow(max(dot(viewDir, reflectDir), 0.0), 128.0);
+        float spec = pow(max(dot(viewDir, reflectDir), 0.0), 258.0);
         vec3 specular = spec * lightSpecularColor;
 
         vec3 text = texture(uSampler_1, fUv).rgb;
