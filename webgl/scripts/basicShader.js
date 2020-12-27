@@ -27,12 +27,12 @@ function getBasicVertex() {
     void main() 
     { 
         vec4 fragPos = model * vec4(position, 1.0);
-        gl_Position = perspective * view * fragPos;
 
         fColor = color;
         fUv = vec2(uv.x, 1.0 - uv.y);
         fNormal = normalize((model * vec4(normal, 0.0)).xyz);
-        fFragPosLightSpace = lightSpace * vec4(fragPos.xyz, 1.0);
+        fFragPosLightSpace = lightSpace * fragPos;
+        gl_Position = perspective * view * fragPos;
 
         fDirLight = normalize(lightDirection);
         fCamPos = camPos;
@@ -69,10 +69,9 @@ function getBasicFragment() {
         float pixelFromLight = texture(shadowMap, projectedCoordinates.xy).r;
         float currentDepth = projectedCoordinates.z;
     
-        float bias = 0.001;            
+        float bias = 0.001;   
         float shadow = 0.0;
-
-        float texelSize = 1.0 / (2048.0 );
+        float texelSize = 1.0 / 2048.0;
         for(int x = -1; x <= 1; ++x)
         {
             for(int y = -1; y <= 1; ++y)
@@ -83,14 +82,12 @@ function getBasicFragment() {
         }
         shadow /= 9.0;
 
-        return shadow;
-
-        
+        return shadow;        
     }
 
     void main() 
     {
-        float dirLightFactor = max(0.0,dot(normalize(fNormal), -fDirLight));
+        float dirLightFactor = max(0.1,dot(normalize(fNormal), -fDirLight));
         vec3 dLight = lightDiffuseColor * dirLightFactor;
 
 

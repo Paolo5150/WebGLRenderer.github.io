@@ -11,6 +11,7 @@ async function loadOBJ(pathToFile)
             var gVertices = group.vertices
             var gUvs = group.texCoords
             var gNormals = group.normals
+            console.log(wolf.normals)
 
             gVertices = wolf.vertices
             gUvs = wolf.texCoords
@@ -41,8 +42,8 @@ async function loadOBJ(pathToFile)
                         if(normal != undefined)
                         {
                             v.normal[0] = normal[0]
-                            v.normal[0] = normal[1]
-                            v.normal[0] = normal[2]
+                            v.normal[1] = normal[1]
+                            v.normal[2] = normal[2]
                         }
                                          
                         tempVertices.push(v)
@@ -54,6 +55,7 @@ async function loadOBJ(pathToFile)
                     
                     if(normal == undefined)
                     {
+
                         var v1v2 = vec3.create()
                         v1v2[0] = tempVertices[1].position[0] - tempVertices[0].position[0]
                         v1v2[1] = tempVertices[1].position[1] - tempVertices[0].position[1]
@@ -130,5 +132,6 @@ function getQuadMesh() {
     let mesh = new Mesh(vs,is)
     return mesh
 }
+
 
 

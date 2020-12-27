@@ -118,6 +118,7 @@ class Camera
         this.view = mat4.create()
         var fwd = vec3.create()
         fwd = vec3.add(fwd, this.position, [0,0,-1])
+        
         this.view = mat4.lookAt(this.view, this.position, this.target, [0,1,0])
     }
 

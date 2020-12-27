@@ -10,9 +10,11 @@ camera.position = [0 , 0 , 5]
 camera.updateView()
 
 var deer = null
+var cube = null
 
-var shadowCameraSize = 5
-let shadowCamera = Camera.ortho(-shadowCameraSize,shadowCameraSize,-shadowCameraSize,shadowCameraSize,0.1,50)
+var shadowCameraSize = 3
+let shadowCamera = Camera.ortho(-shadowCameraSize,shadowCameraSize,-shadowCameraSize,shadowCameraSize,0.1,40)
+
 shadowCamera.position = [0,0,10]
 shadowCamera.updateView()
 
@@ -36,6 +38,7 @@ let woodMat = getWoodMaterial(camera)
 let unlitMat = getUnlitMaterial()
 let floorMat = geFloorMaterial(camera)
 floorMat.addTexture("shadowMap", shadowFrameBuf.attachments['depth'])
+woodMat.addTexture("shadowMap", shadowFrameBuf.attachments['depth'])
 
 
 let quadViewer = new MeshRenderer(getQuadMesh(), textureOnlyMaterial)
@@ -58,23 +61,33 @@ floor.position = [0,0,0]
 floor.scale = [10,10,10]
 renderer.addMeshRenderer(floor)
 
+loadOBJ("webgl/models/cubic.obj").then((value) => {
+    if(value != undefined)
+    {
+        let meshR = new MeshRenderer(value,woodMat)
+        meshR.position = [-2,3,1]
+        meshR.rotation = [0,0,0]
 
+        renderer.addMeshRenderer(meshR)
+        cube = meshR
+    }
+})
 
 loadOBJ("webgl/models/deer.obj").then((value) => {
     if(value != undefined)
     {
         let meshR = new MeshRenderer(value,woodMat)
-        meshR.scale = [0.01,0.01,0.01]
         meshR.position = [0,0,0]
+        meshR.scale = [0.01,0.01,0.01]
         meshR.rotation = [0,0,0]
 
         renderer.addMeshRenderer(meshR)
         deer = meshR
-        camera.target = meshR.position
-
- 
     }
 })
+
+
+
 
 var prev = 0;
 var now = 0
@@ -92,6 +105,8 @@ var render = function(time) {
     camera.position[0] += mousePositionDelta[0] * delta * 10
     camera.updateView()
 
+    if(cube != null)
+        cube.rotation[1] += delta * 20
 
     //Create shadow depth 
     shadowFrameBuf.bind();
@@ -100,36 +115,42 @@ var render = function(time) {
     var lightNorm = vec3.create()
     lightNorm = vec3.normalize(lightNorm, uiManager.lightDir)
 
-    lightNorm[0] *=-1 * shadowCamera.farPlane *0.8
-    lightNorm[1] *=-1* shadowCamera.farPlane *0.8
-    lightNorm[2] *=-1* shadowCamera.farPlane *0.8
+    lightNorm[0] *=-1 * shadowCamera.farPlane *0.4
+    lightNorm[1] *=-1* shadowCamera.farPlane *0.4
+    lightNorm[2] *=-1* shadowCamera.farPlane *0.4
 
     var toLight = vec3.create()
-    toLight = vec3.add(toLight, [0,0,0], lightNorm);
+    toLight = vec3.add(toLight, [0,1,0], lightNorm);
 
     //randomQuad.position = toLightd
     shadowCamera.position = toLight
-    shadowCamera.target = [0,0,0]
+    shadowCamera.target = [0,1,0]
 
     shadowCamera.updateView()
 
-    //Tricky javascript stuff
-    floorMat.lightSpace = mat4.create()
-    floorMat.lightSpace = mat4.mul(floorMat.lightSpace, shadowCamera.projection, shadowCamera.view)
 
 
 
     renderer.clearAll(0,0,0,1)
-    gl.disable(gl.CULL_FACE);
+    gl.frontFace(gl.CW)
 
     renderer.renderForceMaterial(shadowCamera,time, unlitMat)
     Framebuffer.unbind()
-    gl.enable(gl.CULL_FACE);
+    gl.frontFace(gl.CCW)
 
 
+   
     //Render scene to frame buffer
     frameBuf.bind()
     renderer.clearAll(0,0,0,1)
+
+        //Tricky javascript stuff
+        floorMat.lightSpace = mat4.create()
+        floorMat.lightSpace = mat4.mul(floorMat.lightSpace, shadowCamera.projection, shadowCamera.view)
+    
+        woodMat.lightSpace = mat4.create()
+        woodMat.lightSpace = floorMat.lightSpace 
+        
     renderer.render(camera,time)
     Framebuffer.unbind()
 

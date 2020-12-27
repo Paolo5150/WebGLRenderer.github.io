@@ -48,15 +48,15 @@ class Renderer
         
     }
 
-    render(camera, time) {        
+    render(cam, time) {        
 
         if(this.allRenderers != null || this.allRenderers != undefined)
         {
             for(var i=0; i< this.allRenderers.length; i++)
             { 
                 this.allRenderers[i].material.bind()
-                this.allRenderers[i].updateShaderWithMaterialInfo(camera)
-                this.allRenderers[i].render(camera, time)
+                this.allRenderers[i].updateShaderWithMaterialInfo(cam)
+                this.allRenderers[i].render(cam, time)
             }
         }
         
