@@ -15,6 +15,10 @@ class Material {
 
 
     }
+    
+    updateShader() {
+        
+    }
 
     bind() {
 
@@ -31,7 +35,6 @@ class Material {
 
         }
 
-        this.onPreRender()
         
 
     }

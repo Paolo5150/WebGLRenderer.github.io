@@ -36,11 +36,11 @@ $( document ).ready(function() {
 
         if(e.key === 'a')
             mousePositionDelta[0] = -1
-        if(e.key === 'd')
+        else if(e.key === 'd')
             mousePositionDelta[0] = 1
         if(e.key === 'w')
             mousePositionDelta[1] = -1
-        if(e.key === 's')
+        else if(e.key === 's')
             mousePositionDelta[1] = 1
     })
 

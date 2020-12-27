@@ -1,54 +1,71 @@
 class Framebuffer {
-    constructor() {
+    constructor(width, height) {
       this.attachments = new Map();  
 
         this.frameBuffer = gl.createFramebuffer()
+        this.width = width
+        this.height = height
+    }
 
+    setNoColor() {
+      gl.bindFramebuffer(gl.FRAMEBUFFER, this.frameBuffer)
+
+      gl.drawBuffers( [gl.NONE]);
+      gl.readBuffer([gl.NONE]);
 
     }
 
-    addColorAttachment(width, height, count) {
+    addColorAttachment( count) {
       gl.bindFramebuffer(gl.FRAMEBUFFER, this.frameBuffer)
 
       for(var i=0; i< count; i++) {
 
         var id = "color" + i
-        var t = Texture.CreateEmpty(width, height)
+        var t = Texture.CreateEmpty(this.width, this.height)
         t.bind()
         gl.framebufferTexture2D(gl.FRAMEBUFFER, gl.COLOR_ATTACHMENT0 + i, gl.TEXTURE_2D, t.textID, 0);
     
         this.attachments[id] = t
     }
-      gl.drawBuffers( [gl.COLOR_ATTACHMENT0, gl.COLOR_ATTACHMENT1]);
 
       gl.bindFramebuffer(gl.FRAMEBUFFER, null)
 
     }
 
 
-    addColorAttachmentFloatFormat(width, height, count) {
+    addColorAttachmentFloatFormat( count) {
       gl.bindFramebuffer(gl.FRAMEBUFFER, this.frameBuffer)
 
       for(var i=0; i< count; i++) {
 
         var id = "color" + i
-        var t = Texture.CreateEmptyFloatFormat(width, height)
+        var t = Texture.CreateEmptyFloatFormat(this.width, this.height)
         t.bind()
         gl.framebufferTexture2D(gl.FRAMEBUFFER, gl.COLOR_ATTACHMENT0 + i, gl.TEXTURE_2D, t.textID, 0);
     
         this.attachments[id] = t
     }
-      gl.drawBuffers( [gl.COLOR_ATTACHMENT0, gl.COLOR_ATTACHMENT1]);
 
       gl.bindFramebuffer(gl.FRAMEBUFFER, null)
 
     }
 
-    addDepthAttachment(width, height) {
+    addDepthAttachmentFloat() {
       gl.bindFramebuffer(gl.FRAMEBUFFER, this.frameBuffer)
 
-      var id = "depth" + Object.keys(this.attachments).length
-      this.attachments[id] = Texture.CreateDepth(width, height)
+      var id = "depth"
+      this.attachments[id] = Texture.CreateDepthFloat(this.width,this.height)
+      gl.framebufferTexture2D(gl.FRAMEBUFFER, gl.DEPTH_ATTACHMENT, gl.TEXTURE_2D, this.attachments[id].textID, 0);
+      gl.bindFramebuffer(gl.FRAMEBUFFER, null)
+
+    }
+
+    addDepthAttachment() {
+
+      var id = "depth"
+      this.attachments[id] = Texture.CreateDepth(this.width, this.height)
+      gl.bindFramebuffer(gl.FRAMEBUFFER, this.frameBuffer)
+
       gl.framebufferTexture2D(gl.FRAMEBUFFER, gl.DEPTH_ATTACHMENT, gl.TEXTURE_2D, this.attachments[id].textID, 0);
       gl.bindFramebuffer(gl.FRAMEBUFFER, null)
 
@@ -56,7 +73,9 @@ class Framebuffer {
 
     bind() {
       gl.bindFramebuffer(gl.FRAMEBUFFER, this.frameBuffer)
-     gl.drawBuffers( [gl.COLOR_ATTACHMENT0, gl.COLOR_ATTACHMENT1]);
+      gl.viewport(0, 0, this.width, this.height);
+      gl.enable(gl.DEPTH_TEST)
+
 
     }
 
