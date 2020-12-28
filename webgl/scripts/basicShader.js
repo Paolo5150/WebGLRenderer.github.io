@@ -12,9 +12,9 @@ function getBasicVertex() {
     out vec3 fColor;
     out vec3 fNormal;
     out vec2 fUv;
+
     out vec3 fTangent;
     out vec3 fBitangent;
-
 
     out vec3 fDirLight;
     out vec3 fCamPos;
@@ -31,6 +31,7 @@ function getBasicVertex() {
 
     void main() 
     { 
+
         vec4 fragPos = model * vec4(position, 1.0);
 
         fColor = color;
@@ -58,15 +59,10 @@ function getBasicFragment() {
     in vec3 fNormal;
     in vec2 fUv;
 
-    in vec3 fTangent;
-    in vec3 fBitangent;
-
-
     in vec3 fDirLight;
     in vec3 fCamPos;
     in vec3 fFragPos;
     in vec4 fFragPosLightSpace;
-
 
     uniform vec3 lightDiffuseColor;
     uniform vec3 lightSpecularColor;

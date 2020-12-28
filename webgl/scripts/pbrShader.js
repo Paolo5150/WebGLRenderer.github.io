@@ -1,4 +1,4 @@
-function getPBRVertex() {
+function getPBRShaderVertex() {
 
     return `#version 300 es
 
@@ -6,10 +6,16 @@ function getPBRVertex() {
     in vec3 color;
     in vec2 uv;
     in vec3 normal;
+    in vec3 tangent;
+    in vec3 bitangent;
 
     out vec3 fColor;
     out vec3 fNormal;
     out vec2 fUv;
+
+    out vec3 fFragPosTBN;
+    out vec3 fCamPosTBN;
+    out vec3 fLightDirTBN;
 
     out vec3 fDirLight;
     out vec3 fCamPos;
@@ -26,6 +32,12 @@ function getPBRVertex() {
 
     void main() 
     { 
+
+        vec3 T = normalize(vec3(model * vec4(tangent,   0.0)));
+        vec3 B = normalize(vec3(model * vec4(bitangent, 0.0)));
+        vec3 N = normalize(vec3(model * vec4(normal,    0.0)));
+        mat3 TBN = transpose(mat3(T, B, N));
+
         vec4 fragPos = model * vec4(position, 1.0);
 
         fColor = color;
@@ -37,11 +49,16 @@ function getPBRVertex() {
         fDirLight = normalize(lightDirection);
         fCamPos = camPos;
         fFragPos = fragPos.xyz;
+
+        fFragPosTBN = TBN * fragPos.xyz;
+        fCamPosTBN = TBN * camPos;
+        fLightDirTBN = TBN * fDirLight;
+
     }
     `
 }
 
-function getPBRFragment() {
+function getPBRShaderFragment() {
 
     return `#version 300 es
     precision highp float;
@@ -55,12 +72,29 @@ function getPBRFragment() {
     in vec3 fFragPos;
     in vec4 fFragPosLightSpace;
 
+    in vec3 fFragPosTBN;
+    in vec3 fCamPosTBN;
+    in vec3 fLightDirTBN;
 
     uniform vec3 lightDiffuseColor;
     uniform vec3 lightSpecularColor;
-    uniform sampler2D uSampler_1;
+
+    uniform sampler2D  albedoMap;
+    uniform sampler2D metallicMap;
+    uniform sampler2D normalMap;
+    uniform sampler2D roughnessMap;
+    uniform sampler2D aoMap;
     uniform sampler2D shadowMap;
+
+
     out vec4 myOutputColor;
+
+    //Functions definitions
+    float PI = 3.14159265359;
+    float DistributionGGX(vec3 N, vec3 H, float roughness);
+    float GeometrySchlickGGX(float NdotV, float roughness);
+    float GeometrySmith(vec3 N, vec3 V, vec3 L, float roughness);
+    vec3 fresnelSchlick(float cosTheta, vec3 F0);
 
     float CalculateShadow()
     {
@@ -87,22 +121,91 @@ function getPBRFragment() {
 
     void main() 
     {
-        float dirLightFactor = max(0.1,dot(normalize(fNormal), -fDirLight));
-        vec3 dLight = lightDiffuseColor * dirLightFactor;
 
+        
+        vec3 albedo     = pow(texture(albedoMap, fUv).rgb, vec3(2.2));
+        float metallic  =  texture(metallicMap, fUv).r;
+        float roughness     =  texture(roughnessMap, fUv).r;
+        float ao        =  texture(aoMap, fUv).r;
 
-        vec3 viewDir = normalize(fCamPos - fFragPos);
-        vec3 reflectDir = reflect(fDirLight, fNormal);
-        float spec = pow(max(dot(viewDir, reflectDir), 0.0), 258.0);
-        vec3 specular = spec * lightSpecularColor;
+        vec3 N = normalize(texture(normalMap, fUv).rgb * 2.0 - 1.0);
+        vec3 V = normalize(fCamPosTBN - fFragPosTBN);
 
-        vec3 text = texture(uSampler_1, fUv).rgb;
+        vec3 F0 = vec3(0.04); 
+        F0 = mix(F0, albedo, metallic);
+        vec3 Lo = vec3(0.0);
+
+        vec3 L = normalize(-fLightDirTBN);
+        vec3 H = normalize(V + L);
+        float lightIntensity = 1.0;
+        vec3 radiance = lightDiffuseColor * lightIntensity;
+        
+        float NDF = DistributionGGX(N, H, roughness);
+		float G   = GeometrySmith(N, V, L, roughness);      
+        vec3 F    = fresnelSchlick(max(dot(H, V), 0.0), F0);
+
+        vec3 kS = F;
+        vec3 kD = vec3(1.0) - kS;
+        kD *= 1.0 - metallic;
+		
+		vec3 numerator    = NDF * G * F;
+        float denominator = 4.0 * max(dot(N, V), 0.0) * max(dot(N, L), 0.0);
+        vec3 specular     = numerator / max(denominator, 0.001);
+		
+		float NdotL = max(dot(N, L), 0.0);                
+        Lo += (kD * albedo / PI + specular) * radiance * NdotL;
+
+        vec3 ambient = vec3(0.03) * albedo * ao;
+        vec3 col = ambient + Lo;
+
 
         float shadow = 1.0 - CalculateShadow();
 
-        vec3 finalColor = shadow * text * (dLight + specular);
+        vec3 finalColor = shadow * col;
+
         myOutputColor = vec4(finalColor,1);
     }
+
+    float DistributionGGX(vec3 N, vec3 H, float roughness)
+    {
+        float a      = roughness*roughness;
+        float a2     = a*a;
+        float NdotH  = max(dot(N, H), 0.0);
+        float NdotH2 = NdotH*NdotH;
+        
+        float num   = a2;
+        float denom = (NdotH2 * (a2 - 1.0) + 1.0);
+        denom = PI * denom * denom;
+        
+        return num / denom;
+    }
+
+    vec3 fresnelSchlick(float cosTheta, vec3 F0)
+    {
+        return F0 + (1.0 - F0) * pow(1.0 - cosTheta, 5.0);
+    }
+
+    float GeometrySchlickGGX(float NdotV, float roughness)
+    {
+        float r = (roughness + 1.0);
+        float k = (r*r) / 8.0;
+
+        float num   = NdotV;
+        float denom = NdotV * (1.0 - k) + k;
+        
+        return num / denom;
+    }
+    float GeometrySmith(vec3 N, vec3 V, vec3 L, float roughness)
+    {
+        float NdotV = max(dot(N, V), 0.0);
+        float NdotL = max(dot(N, L), 0.0);
+        float ggx2  = GeometrySchlickGGX(NdotV, roughness);
+        float ggx1  = GeometrySchlickGGX(NdotL, roughness);
+        
+        return ggx1 * ggx2;
+    }
+
+
     
     `
 }

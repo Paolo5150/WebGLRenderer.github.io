@@ -6,13 +6,16 @@ var textureExtensions = gl.getExtension("WEBGL_draw_buffers");
 var colorBufferFloatExtension = this.gl.getExtension('EXT_color_buffer_float');
 let renderer =  new Renderer(canvas.width, canvas.height)
 let camera = Camera.perspective(60,16.0/9.0,0.1,50)
-camera.position = [0 , 0 , 5]
+camera.position = [0 , 8 , 5]
 camera.updateView()
+var cameraAngle = Math.PI / 2.0
+
+var cameraDistance = 10
 
 var deer = null
 var cube = null
 
-var shadowCameraSize = 3
+var shadowCameraSize = 4
 let shadowCamera = Camera.ortho(-shadowCameraSize,shadowCameraSize,-shadowCameraSize,shadowCameraSize,0.1,60)
 
 shadowCamera.position = [0,0,10]
@@ -37,10 +40,19 @@ let textureOnlyMaterial = new Material(textureOnlyShader)
 textureOnlyMaterial.addTexture("uSampler_1",shadowFrameBuf.attachments['depth'])
 
 let woodMat = getWoodMaterial(camera)
+let pbrMat = getPBRMaterial(camera)
+pbrMat.addTexture("shadowMap", shadowFrameBuf.attachments['depth'])
+
 let depthRender = getDepthRenderMaterial()
 let floorMat = geFloorMaterial(camera)
 floorMat.addTexture("shadowMap", shadowFrameBuf.attachments['depth'])
 woodMat.addTexture("shadowMap", shadowFrameBuf.attachments['depth'])
+
+pbrMat.addMat4Uniform("lightSpace", ()=>{
+    var ls = mat4.create()
+    ls = mat4.mul(ls, shadowCamera.projection, shadowCamera.view)
+    return ls
+})
 
 floorMat.addMat4Uniform("lightSpace", ()=>{
         var ls = mat4.create()
@@ -70,13 +82,13 @@ let randomQuad = new MeshRenderer(getQuadMesh(), woodMat)
 
 floor.rotation[0] = -90
 floor.position = [0,0,-1]
-floor.scale = [10,10,10]
+floor.scale = [15,15,15]
 renderer.addMeshRenderer(floor)
 
 loadOBJ("webgl/models/cubic.obj").then((value) => {
     if(value != undefined)
     {
-        let meshR = new MeshRenderer(value,woodMat)
+        let meshR = new MeshRenderer(value,pbrMat)
         meshR.position = [-2,4,2]
         meshR.rotation = [0,0,0]
 
@@ -88,7 +100,7 @@ loadOBJ("webgl/models/cubic.obj").then((value) => {
 loadOBJ("webgl/models/deer.obj").then((value) => {
     if(value != undefined)
     {
-        let meshR = new MeshRenderer(value,woodMat)
+        let meshR = new MeshRenderer(value,pbrMat)
         meshR.position = [0,0,0]
         meshR.scale = [0.01,0.01,0.01]
         meshR.rotation = [0,0,0]
@@ -110,8 +122,28 @@ var render = function(time) {
     delta = (now - prev) * 0.001;
     prev = now
 
-    camera.position[1] += mousePositionDelta[1] * delta * 10
-    camera.position[0] += mousePositionDelta[0] * delta * 10
+   /* camera.position[0] += mousePositionDelta[0] * delta * 10
+    if(leftButtonDown)
+        camera.position[2] += mousePositionDelta[1] * delta * 10
+    else
+        camera.position[1] += mousePositionDelta[1] * delta * 10*/
+
+    if(leftButtonDown)
+    {
+        cameraDistance -= mousePositionDelta[1] * delta * 10
+    }
+    else
+    {
+        camera.position[1] += mousePositionDelta[1] * delta * 10
+    }
+
+    cameraAngle += mousePositionDelta[0] * delta 
+
+    camera.position[0] = Math.cos(cameraAngle) * cameraDistance
+    camera.position[2] = Math.sin(cameraAngle) * cameraDistance
+
+
+
     camera.updateView()
 
     if(deer != null)
@@ -121,7 +153,6 @@ var render = function(time) {
 
     //Create shadow depth 
     shadowFrameBuf.bind();
-    var mid = camera.getFrustumMidPoint()
 
     var lightNorm = vec3.create()
     lightNorm = vec3.normalize(lightNorm, uiManager.lightDir)

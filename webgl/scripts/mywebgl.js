@@ -1,5 +1,5 @@
 function loadAll() {
-
+    console.log("Loading")
     $.getScript('webgl/scripts/mesh.js');
     $.getScript('webgl/scripts/OBJLoader.js');
     $.getScript('webgl/scripts/modelUtils.js');
@@ -11,6 +11,8 @@ function loadAll() {
     $.getScript('webgl/scripts/material.js');
     $.getScript('webgl/scripts/renderer.js');
     $.getScript('webgl/scripts/basicShader.js');
+    $.getScript('webgl/scripts/normalMappedShader.js');
+    $.getScript('webgl/scripts/pbrShader.js');
     $.getScript('webgl/scripts/textureOnlyShader.js');
     $.getScript('webgl/scripts/tonemapShader.js');
     $.getScript('webgl/scripts/materialUtils.js');

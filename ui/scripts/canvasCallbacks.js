@@ -1,5 +1,8 @@
 var mousePosition = [0,0]
 var mousePositionDelta = [0,0]
+var leftButtonDown = false
+var rightButtonDown = false
+var midButtonDown = false
 var moving = false
 $( document ).ready(function() {
 
@@ -7,7 +10,9 @@ $( document ).ready(function() {
     var clicking = false
 
     $("#mycanvas").mouseup(function(){
-        clicking = false
+        leftButtonDown = false
+        rightButtonDown = false
+        midButtonDown = false
     });
       
     $("#mycanvas").mousedown(function(e){
@@ -17,12 +22,15 @@ $( document ).ready(function() {
                 clicking = true
                 mousePositionDelta = [0,0]
                 mousePosition = [e.pageX,e.pageY]
+                leftButtonDown = true
 
                 break;
             case 2:
-               // alert('Middle Mouse button pressed.');
+               midButtonDown = true
+
                 break;
             case 3:
+                rightButtonDown = true
                 break;
             default:
                 alert('You have a strange Mouse!');
@@ -35,13 +43,13 @@ $( document ).ready(function() {
     $( document ).on( "keydown", function( e ){
 
         if(e.key === 'a')
-            mousePositionDelta[0] = -1
-        else if(e.key === 'd')
             mousePositionDelta[0] = 1
+        else if(e.key === 'd')
+            mousePositionDelta[0] = -1
         if(e.key === 'w')
-            mousePositionDelta[1] = -1
-        else if(e.key === 's')
             mousePositionDelta[1] = 1
+        else if(e.key === 's')
+            mousePositionDelta[1] = -1
     })
 
     $( document ).on( "keyup", function( e ){
