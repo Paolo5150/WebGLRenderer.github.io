@@ -34,6 +34,14 @@ class Renderer
         
     }
 
+    renderMeshRendererForceMaterial(camera, time, mr, material) {       
+
+        material.bind()
+        mr.updateShaderWithMaterialInfoForceMaterial(camera, material)
+        mr.render(camera, time)
+        
+    }
+
     renderForceMaterial(camera, time, material) {        
 
         material.bind()

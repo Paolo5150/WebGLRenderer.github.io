@@ -116,6 +116,35 @@ function getBasicFragment() {
     `
 }
 
+function getBasicUntexturedFragment() {
+
+    return `#version 300 es
+    precision highp float;
+
+    in vec3 fColor;
+    in vec3 fNormal;
+    in vec2 fUv;
+
+    in vec3 fDirLight;
+    in vec3 fCamPos;
+    in vec3 fFragPos;
+    in vec4 fFragPosLightSpace;
+
+    uniform vec3 tint;
+    out vec4 myOutputColor;
+
+   
+    void main() 
+    {
+
+        vec3 finalColor = tint;
+
+        myOutputColor = vec4(finalColor,1);
+    }
+    
+    `
+}
+
 function getBasicDepthShaderVertex() {
 
     return `#version 300 es

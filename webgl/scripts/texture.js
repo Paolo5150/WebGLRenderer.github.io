@@ -42,6 +42,12 @@ class Texture
         return t
     }
 
+    static Unbind() {
+        gl.activeTexture(gl.TEXTURE0 );
+
+        gl.bindTexture(gl.TEXTURE_2D, null);
+
+    }
     static CreateDepthFloat(widh, height) {
         let t = new Texture()
 

@@ -15,6 +15,17 @@ function getWoodMaterial(cam) {
     return mat
 }
 
+function getUntexturedMaterial(cam, tint) {
+
+    var basicShader = createShaderProgram(getBasicVertex(), getBasicUntexturedFragment())
+
+
+    let mat = new Material(basicShader)
+    mat.addVec3Uniform("tint", ()=>{return tint})
+
+    return mat
+}
+
 function geFloorMaterial(cam) {
 
     var basicShader = createShaderProgram(getNormalMappedShaderVertex(), getNormalMappedShaderFragment())
@@ -43,35 +54,7 @@ function getDepthRenderMaterial() {
     return mat
 }
 
-function getPostProcessBrightnessExtractMaterial() {
-    var tonemapShader = createShaderProgram(getTonemapVertex(), getExtractBrightnessFragment())
 
-
-    let quadMaterial = new Material(tonemapShader)
-    quadMaterial.onPreRender = ()=>{}
-    return quadMaterial
-}
-
-function getPostProcessBasicMaterial() {
-    var tonemapShader = createShaderProgram(getTonemapVertex(), getPostProcessBasicFragment())
-
-
-    let quadMaterial = new Material(tonemapShader)
-    quadMaterial.onPreRender = ()=>{}
-    return quadMaterial
-}
-
-function getPostProcessHDRMaterial() {
-    var tonemapShader = createShaderProgram(getTonemapVertex(), getTonemapFragment())
-
-
-    let quadMaterial = new Material(tonemapShader)
-
-    quadMaterial.addFloatUniform("gamma", ()=>{return uiManager.gamma})
-    quadMaterial.addFloatUniform("exposure", ()=>{return uiManager.exposure})
-
-    return quadMaterial
-}
 
 function getPBRMaterial(cam) {
 
@@ -98,4 +81,40 @@ function getPBRMaterial(cam) {
 
 
 return mat
+}
+
+function getPostProcessBrightnessExtractMaterial() {
+    var tonemapShader = createShaderProgram(getTonemapVertex(), getExtractBrightnessFragment())
+
+
+    let quadMaterial = new Material(tonemapShader)
+    return quadMaterial
+}
+
+function getPostProcessBasicMaterial() {
+    var tonemapShader = createShaderProgram(getTonemapVertex(), getPostProcessBasicFragment())
+
+
+    let quadMaterial = new Material(tonemapShader)
+    return quadMaterial
+}
+
+function getPostProcessBlurMaterial() {
+    var tonemapShader = createShaderProgram(getTonemapVertex(), getBlurShaderFragment())
+
+
+    let quadMaterial = new Material(tonemapShader)
+    return quadMaterial
+}
+
+function getPostProcessHDRMaterial() {
+    var tonemapShader = createShaderProgram(getTonemapVertex(), getTonemapFragment())
+
+
+    let quadMaterial = new Material(tonemapShader)
+
+    quadMaterial.addFloatUniform("gamma", ()=>{return uiManager.gamma})
+    quadMaterial.addFloatUniform("exposure", ()=>{return uiManager.exposure})
+
+    return quadMaterial
 }
