@@ -5,24 +5,14 @@ function getWoodMaterial(cam) {
     let text = Texture.FromURL('https://images-wixmp-ed30a86b8c4ca887773594c2.wixmp.com/f/385064a4-77d4-4bb1-927b-2dcf9f0fb658/d1hnki3-3070ff4b-08e2-4ce6-bd29-59dfb277fb0d.jpg/v1/fill/w_600,h_600,q_75,strp/tileable_wood_texture_by_ftourini_stock_d1hnki3-fullview.jpg?token=eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ1cm46YXBwOiIsImlzcyI6InVybjphcHA6Iiwib2JqIjpbW3siaGVpZ2h0IjoiPD02MDAiLCJwYXRoIjoiXC9mXC8zODUwNjRhNC03N2Q0LTRiYjEtOTI3Yi0yZGNmOWYwZmI2NThcL2QxaG5raTMtMzA3MGZmNGItMDhlMi00Y2U2LWJkMjktNTlkZmIyNzdmYjBkLmpwZyIsIndpZHRoIjoiPD02MDAifV1dLCJhdWQiOlsidXJuOnNlcnZpY2U6aW1hZ2Uub3BlcmF0aW9ucyJdfQ.MGgFuUmkYOmpjtHxXXOs19TAXjOpDrUAlCsYteKUwBE')
 
 
-    let woodMaterial = new Material(basicShader)
-    woodMaterial.addTexture("uSampler_1",text)
-    woodMaterial.onPreRender = ()=>{
+    let mat = new Material(basicShader)
+    mat.addTexture("uSampler_1",text)
+    mat.addVec3Uniform("lightDirection", ()=>{return uiManager.lightDir})
+    mat.addVec3Uniform("lightDiffuseColor", ()=>{return uiManager.lightDiffuseColor})
+    mat.addVec3Uniform("lightSpecularColor", ()=>{return uiManager.lightSpecularColor})
+    mat.addVec3Uniform("camPos", ()=>{return cam.position})
 
-    var dirLightUniform = gl.getUniformLocation(woodMaterial.shader, "lightDirection")
-    gl.uniform3fv(dirLightUniform, [uiManager.lightDir[0], uiManager.lightDir[1], uiManager.lightDir[2]]);
-
-    var lightDifUniform = gl.getUniformLocation(woodMaterial.shader, "lightDiffuseColor")
-    gl.uniform3fv(lightDifUniform, uiManager.lightDiffuseColor);
-
-    var lightSpecUniform = gl.getUniformLocation(woodMaterial.shader, "lightSpecularColor")
-    gl.uniform3fv(lightSpecUniform, uiManager.lightSpecularColor);
-
-    var camPositionUniform = gl.getUniformLocation(woodMaterial.shader, "camPos")
-    gl.uniform3fv(camPositionUniform, cam.position);
-}
-
-return woodMaterial
+    return mat
 }
 
 function geFloorMaterial(cam) {
@@ -35,22 +25,12 @@ function geFloorMaterial(cam) {
     mat.addTexture("uSampler_1",text)
     mat.addTexture("normalMap", textNormalMap)
 
-    mat.onPreRender = ()=>{
+    mat.addVec3Uniform("lightDirection", ()=>{return uiManager.lightDir})
+    mat.addVec3Uniform("lightDiffuseColor", ()=>{return uiManager.lightDiffuseColor})
+    mat.addVec3Uniform("lightSpecularColor", ()=>{return uiManager.lightSpecularColor})
+    mat.addVec3Uniform("camPos", ()=>{return cam.position})
 
-    var dirLightUniform = gl.getUniformLocation(mat.shader, "lightDirection")
-    gl.uniform3fv(dirLightUniform, [uiManager.lightDir[0], uiManager.lightDir[1], uiManager.lightDir[2]]);
-
-    var lightDifUniform = gl.getUniformLocation(mat.shader, "lightDiffuseColor")
-    gl.uniform3fv(lightDifUniform, uiManager.lightDiffuseColor);
-
-    var lightSpecUniform = gl.getUniformLocation(mat.shader, "lightSpecularColor")
-    gl.uniform3fv(lightSpecUniform, uiManager.lightSpecularColor);
-
-    var camPositionUniform = gl.getUniformLocation(mat.shader, "camPos")
-    gl.uniform3fv(camPositionUniform, cam.position);
-}
-
-return mat
+    return mat
 }
 
 function getDepthRenderMaterial() {
@@ -63,21 +43,34 @@ function getDepthRenderMaterial() {
     return mat
 }
 
+function getPostProcessBrightnessExtractMaterial() {
+    var tonemapShader = createShaderProgram(getTonemapVertex(), getExtractBrightnessFragment())
+
+
+    let quadMaterial = new Material(tonemapShader)
+    quadMaterial.onPreRender = ()=>{}
+    return quadMaterial
+}
+
+function getPostProcessBasicMaterial() {
+    var tonemapShader = createShaderProgram(getTonemapVertex(), getPostProcessBasicFragment())
+
+
+    let quadMaterial = new Material(tonemapShader)
+    quadMaterial.onPreRender = ()=>{}
+    return quadMaterial
+}
+
 function getPostProcessHDRMaterial() {
     var tonemapShader = createShaderProgram(getTonemapVertex(), getTonemapFragment())
 
 
     let quadMaterial = new Material(tonemapShader)
-quadMaterial.addTexture("uSampler_1",frameBuf.attachments['color0'])
-quadMaterial.onPreRender = ()=>{
 
-    var gamma = gl.getUniformLocation(quadMaterial.shader, "gamma")
-    gl.uniform1f(gamma, uiManager.gamma);
+    quadMaterial.addFloatUniform("gamma", ()=>{return uiManager.gamma})
+    quadMaterial.addFloatUniform("exposure", ()=>{return uiManager.exposure})
 
-    var exp = gl.getUniformLocation(quadMaterial.shader, "exposure")
-    gl.uniform1f(exp, uiManager.exposure);
-}
-return quadMaterial
+    return quadMaterial
 }
 
 function getPBRMaterial(cam) {
@@ -98,20 +91,11 @@ function getPBRMaterial(cam) {
     mat.addTexture("roughnessMap",roughness)
 
 
-    mat.onPreRender = ()=>{
+    mat.addVec3Uniform("lightDirection", ()=>{return uiManager.lightDir})
+    mat.addVec3Uniform("lightDiffuseColor", ()=>{return uiManager.lightDiffuseColor})
+    mat.addVec3Uniform("lightSpecularColor", ()=>{return uiManager.lightSpecularColor})
+    mat.addVec3Uniform("camPos", ()=>{return cam.position})
 
-    var dirLightUniform = gl.getUniformLocation(mat.shader, "lightDirection")
-    gl.uniform3fv(dirLightUniform, [uiManager.lightDir[0], uiManager.lightDir[1], uiManager.lightDir[2]]);
-
-    var lightDifUniform = gl.getUniformLocation(mat.shader, "lightDiffuseColor")
-    gl.uniform3fv(lightDifUniform, uiManager.lightDiffuseColor);
-
-    var lightSpecUniform = gl.getUniformLocation(mat.shader, "lightSpecularColor")
-    gl.uniform3fv(lightSpecUniform, uiManager.lightSpecularColor);
-
-    var camPositionUniform = gl.getUniformLocation(mat.shader, "camPos")
-    gl.uniform3fv(camPositionUniform, cam.position);
-}
 
 return mat
 }

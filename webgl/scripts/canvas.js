@@ -28,16 +28,20 @@ shadowFrameBuf.addDepthAttachmentFloat()
 shadowFrameBuf.setNoColor()
 
 //Post process framebuffer
-var frameBuf = new Framebuffer(canvas.width, canvas.height)
-frameBuf.addColorAttachmentFloatFormat( 1)
-frameBuf.addDepthAttachment()
+var regularSceneFrameBuffer = new Framebuffer(canvas.width, canvas.height)
+regularSceneFrameBuffer.addColorAttachmentFloatFormat( 1)
+regularSceneFrameBuffer.addDepthAttachment()
+
+var brightnessFrameBuf = new Framebuffer(canvas.width, canvas.height)
+brightnessFrameBuf.addColorAttachmentFloatFormat( 1)
+brightnessFrameBuf.addDepthAttachment()
 
 
 $( document ).ready(function() {
 
 var textureOnlyShader = createShaderProgram(getTextureOnlyShaderVertex(), getTextureOnlyShaderFragment())
 let textureOnlyMaterial = new Material(textureOnlyShader)
-textureOnlyMaterial.addTexture("uSampler_1",shadowFrameBuf.attachments['depth'])
+textureOnlyMaterial.addTexture("uSampler_1",brightnessFrameBuf.attachments['color0'])
 
 let woodMat = getWoodMaterial(camera)
 let pbrMat = getPBRMaterial(camera)
@@ -66,19 +70,24 @@ woodMat.addMat4Uniform("lightSpace", ()=>{
 
     })
 
-let quadViewer = new MeshRenderer(getQuadMesh(), textureOnlyMaterial)
-quadViewer.scale = [0.3,0.7,1.0]
-quadViewer.position = [-0.8,0.0,0.0]
+let textureViewer = new MeshRenderer(getQuadMesh(), textureOnlyMaterial)
+textureViewer.scale = [0.3,0.7,1.0]
+textureViewer.position = [-0.8,0.0,0.0]
 
 Framebuffer.unbind()
 
+let basicPostProcessMaterial = getPostProcessBasicMaterial()
+basicPostProcessMaterial.addTexture("uSampler_1",regularSceneFrameBuffer.attachments['color0'])
 
-let quad = new MeshRenderer(getQuadMesh(), getPostProcessHDRMaterial())
+let hdrPostProcessMaterial = getPostProcessHDRMaterial()
+hdrPostProcessMaterial.addTexture("uSampler_1",regularSceneFrameBuffer.attachments['color0'])
+
+let brightnessExtractProcessMaterial = getPostProcessBrightnessExtractMaterial()
+brightnessExtractProcessMaterial.addTexture("uSampler_1",regularSceneFrameBuffer.attachments['color0'])
+
+
+let screenQuad = new MeshRenderer(getQuadMesh(), basicPostProcessMaterial)
 let floor = new MeshRenderer(getQuadMesh(), floorMat)
-
-let randomQuad = new MeshRenderer(getQuadMesh(), woodMat)
-
-//renderer.addMeshRenderer(randomQuad)
 
 floor.rotation[0] = -90
 floor.position = [0,0,-1]
@@ -122,11 +131,6 @@ var render = function(time) {
     delta = (now - prev) * 0.001;
     prev = now
 
-   /* camera.position[0] += mousePositionDelta[0] * delta * 10
-    if(leftButtonDown)
-        camera.position[2] += mousePositionDelta[1] * delta * 10
-    else
-        camera.position[1] += mousePositionDelta[1] * delta * 10*/
 
     if(leftButtonDown)
     {
@@ -178,23 +182,27 @@ var render = function(time) {
     gl.frontFace(gl.CCW)
    
     //Render scene to frame buffer
-    frameBuf.bind()
-    renderer.clearAll(0,0,0,1)
-
-
-        
+    regularSceneFrameBuffer.bind()
+    renderer.clearAll(0,0,0,1)        
     // Render scene to post process frame buffer
     renderer.render(camera,time)
     Framebuffer.unbind()
 
+    //Create texture with extracted brightness
+    brightnessFrameBuf.bind()
+    renderer.clearAll(0,0,0,1)        
+    screenQuad.material = brightnessExtractProcessMaterial
+    renderer.renderMeshRenderer(camera,time,screenQuad)
+    
+    //Quad to screen
+    Framebuffer.unbind()
     renderer.clearAll(0,0,0,1)    
     gl.viewport(0, 0, canvas.width, canvas.height);
+    screenQuad.material = hdrPostProcessMaterial
+    renderer.renderMeshRenderer(camera,time,screenQuad)
 
-    //Full screen quad with frame buffer image of scene
-    renderer.renderMeshRenderer(camera,time,quad)
-    
     //Texture viewer
-    renderer.renderMeshRenderer(camera,time,quadViewer)
+    renderer.renderMeshRenderer(camera,time,textureViewer)
 
     window.requestAnimationFrame(render)
 }

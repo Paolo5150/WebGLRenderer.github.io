@@ -48,13 +48,7 @@ function getTextureOnlyShaderFragment() {
 
     void main() 
     {
-        float depthValue = texture(uSampler_1, fUv).r;
-
-        float n = 0.1;
-        float f = 10.0;
-        float z = depthValue;
-        float grey = (2.0 * n) / (f + n - z*(f-n));
-        myOutputColor= vec4(depthValue, depthValue, depthValue, 1.0);
+        myOutputColor= vec4(texture(uSampler_1, fUv).rgb, 1.0);
 
     }
     
