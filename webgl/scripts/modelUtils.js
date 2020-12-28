@@ -77,7 +77,38 @@ async function loadOBJ(pathToFile)
                         }
 
                     }
-                    
+
+                    //Calculate tangent and bitangent
+                    var edge1  = vec3.create()
+                    edge1 [0] = tempVertices[1].position[0] - tempVertices[0].position[0]
+                    edge1 [1] = tempVertices[1].position[1] - tempVertices[0].position[1]
+                    edge1 [2] = tempVertices[1].position[2] - tempVertices[0].position[2]
+
+                    var edge2  = vec3.create()
+                    edge2 [0] = tempVertices[2].position[0] - tempVertices[0].position[0]
+                    edge2 [1] = tempVertices[2].position[1] - tempVertices[0].position[1]
+                    edge2 [2] = tempVertices[2].position[2] - tempVertices[0].position[2]
+
+                    var deltaUV1  = vec2.create()
+                    deltaUV1[0] = tempVertices[1].uv[0] - tempVertices[0].uv[0]
+                    deltaUV1[1] = tempVertices[1].uv[1] - tempVertices[0].uv[1]
+
+                    var deltaUV2  = vec2.create()
+                    deltaUV2[0] = tempVertices[2].uv[0] - tempVertices[0].uv[0]
+                    deltaUV2[1] = tempVertices[2].uv[1] - tempVertices[0].uv[1]
+
+                    var f = 1.0 / (deltaUV1[0] * deltaUV2[1] - deltaUV2[0] * deltaUV1[1]);
+
+                    for(var counter = 0; counter < 3; counter++)
+                        {
+                            allVertex[(allVertex.length - 1) - counter].tangent[0] = f * (deltaUV2[1] * edge1[0] - deltaUV1[1] * edge2[0]);
+                            allVertex[(allVertex.length - 1) - counter].tangent[1] = f * (deltaUV2[1] * edge1[1] - deltaUV1[1] * edge2[1]);
+                            allVertex[(allVertex.length - 1) - counter].tangent[2] = f * (deltaUV2[1] * edge1[2] - deltaUV1[1] * edge2[2]);
+
+                            allVertex[(allVertex.length - 1) - counter].bitangent[0] = f * (-deltaUV2[0] * edge1[0] + deltaUV1[0] * edge2[0]);
+                            allVertex[(allVertex.length - 1) - counter].bitangent[1] = f * (-deltaUV2[0] * edge1[1] + deltaUV1[0] * edge2[1]);
+                            allVertex[(allVertex.length - 1) - counter].bitangent[2] = f * (-deltaUV2[0] * edge1[2] + deltaUV1[0] * edge2[2]);
+                        } 
                 }
 
             let mm = new Mesh(allVertex, allIndex)

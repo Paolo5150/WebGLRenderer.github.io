@@ -4,20 +4,24 @@ class Material {
 
         this.shader = shader
         this.textures = []
+        this.mat4Uniforms = []
         this.onPreRender = ()=>{}
 
     }
 
     addTexture(uniformName, textureID) {
-
         
         this.textures[uniformName] = textureID
-
 
     }
     
     updateShader() {
-        
+    }
+
+    //Pass in a lambda that returns a mat4
+    addMat4Uniform (unifomName, matrixLambda) {
+        this.mat4Uniforms[unifomName] = matrixLambda
+
     }
 
     bind() {
@@ -35,7 +39,13 @@ class Material {
 
         }
 
+        var mat4uniformKeys = Object.keys(this.mat4Uniforms)
+        for(var i=0; i< mat4uniformKeys.length; i++) {
         
+            var mat4Uniform = gl.getUniformLocation(this.shader, mat4uniformKeys[i])
+            gl.uniformMatrix4fv(mat4Uniform, false, this.mat4Uniforms[mat4uniformKeys[i]]());
+        
+        }        
 
     }
 }

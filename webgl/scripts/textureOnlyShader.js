@@ -6,10 +6,14 @@ function getTextureOnlyShaderVertex() {
     in vec3 color;
     in vec2 uv;
     in vec3 normal;
+    in vec3 tangent;
+    in vec3 bitangent;
 
     out vec2 fUv;
     out vec3 fColor;
     out vec3 fNormal;
+    out vec3 fTangent;
+    out vec3 fBitangent;
 
     uniform mat4 model;
     uniform mat4 view;
@@ -24,6 +28,8 @@ function getTextureOnlyShaderVertex() {
 
         fColor = color;
         fNormal = normal;
+        fTangent = tangent;
+        fBitangent = bitangent;
 
 
     }
@@ -39,8 +45,6 @@ function getTextureOnlyShaderFragment() {
 
     uniform sampler2D uSampler_1;
     out vec4 myOutputColor;
-
-
 
     void main() 
     {

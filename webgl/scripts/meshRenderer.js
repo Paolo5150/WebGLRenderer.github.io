@@ -44,14 +44,6 @@ class MeshRenderer
         gl.uniformMatrix4fv(modMatrixUniform, false, model);
         gl.uniformMatrix4fv(viewMatrixUniform, false, camera.view);
         gl.uniformMatrix4fv(perspMatrixUniform, false, camera.projection);
-
-        if(this.material.lightSpace != undefined)
-        {
-            var lightSpace = gl.getUniformLocation(this.material.shader, "lightSpace")
-            gl.uniformMatrix4fv(lightSpace, false, this.material.lightSpace);
-
-
-        }
     }
 
     updateShaderWithMaterialInfoForceMaterial(cam, material) {
@@ -76,18 +68,29 @@ class MeshRenderer
         var position = gl.getAttribLocation(material.shader, "position");
         var color = gl.getAttribLocation(material.shader, "color");
         var uv = gl.getAttribLocation(material.shader, "uv");
-        var normals = gl.getAttribLocation(material.shader, "normal");
+        var normals = gl.getAttribLocation(material.shader, "normal");        
+        var tangent = gl.getAttribLocation(material.shader, "tangent");
+        var bitangent = gl.getAttribLocation(material.shader, "bitangent");
+
+
         gl.enableVertexAttribArray(position);
-        gl.vertexAttribPointer(position, 3, gl.FLOAT, false, 44, 0);
+        gl.vertexAttribPointer(position, 3, gl.FLOAT, false, 68, 0);
 
         gl.enableVertexAttribArray(color);
-        gl.vertexAttribPointer(color, 3, gl.FLOAT, false, 44, 12);
+        gl.vertexAttribPointer(color, 3, gl.FLOAT, false, 68, 12);
 
         gl.enableVertexAttribArray(uv);
-        gl.vertexAttribPointer(uv, 2, gl.FLOAT, false, 44, 24);
+        gl.vertexAttribPointer(uv, 2, gl.FLOAT, false, 68, 24);
 
         gl.enableVertexAttribArray(normals);
-        gl.vertexAttribPointer(normals, 3, gl.FLOAT, false, 44, 32);
+        gl.vertexAttribPointer(normals, 3, gl.FLOAT, false, 68, 32);
+
+        gl.enableVertexAttribArray(tangent);
+        gl.vertexAttribPointer(tangent, 3, gl.FLOAT, false, 68, 44);
+
+        gl.enableVertexAttribArray(bitangent);
+        gl.vertexAttribPointer(bitangent, 3, gl.FLOAT, false, 68, 56);
+        
         this.mesh.render()
     }
    
@@ -102,17 +105,26 @@ class MeshRenderer
         var color = gl.getAttribLocation(this.material.shader, "color");
         var uv = gl.getAttribLocation(this.material.shader, "uv");
         var normals = gl.getAttribLocation(this.material.shader, "normal");
+        var tangent = gl.getAttribLocation(this.material.shader, "tangent");
+        var bitangent = gl.getAttribLocation(this.material.shader, "bitangent");
+
         gl.enableVertexAttribArray(position);
-        gl.vertexAttribPointer(position, 3, gl.FLOAT, false, 44, 0);
+        gl.vertexAttribPointer(position, 3, gl.FLOAT, false, 68, 0);
 
         gl.enableVertexAttribArray(color);
-        gl.vertexAttribPointer(color, 3, gl.FLOAT, false, 44, 12);
+        gl.vertexAttribPointer(color, 3, gl.FLOAT, false, 68, 12);
 
         gl.enableVertexAttribArray(uv);
-        gl.vertexAttribPointer(uv, 2, gl.FLOAT, false, 44, 24);
+        gl.vertexAttribPointer(uv, 2, gl.FLOAT, false, 68, 24);
 
         gl.enableVertexAttribArray(normals);
-        gl.vertexAttribPointer(normals, 3, gl.FLOAT, false, 44, 32);
+        gl.vertexAttribPointer(normals, 3, gl.FLOAT, false, 68, 32);
+
+        gl.enableVertexAttribArray(tangent);
+        gl.vertexAttribPointer(tangent, 3, gl.FLOAT, false, 68, 44);
+
+        gl.enableVertexAttribArray(bitangent);
+        gl.vertexAttribPointer(bitangent, 3, gl.FLOAT, false, 68, 56);
         this.mesh.render()
     }
 }

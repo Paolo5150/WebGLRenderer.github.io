@@ -1,4 +1,4 @@
-function getBasicVertex() {
+function getPBRVertex() {
 
     return `#version 300 es
 
@@ -6,15 +6,10 @@ function getBasicVertex() {
     in vec3 color;
     in vec2 uv;
     in vec3 normal;
-    in vec3 tangent;
-    in vec3 bitangent;
 
     out vec3 fColor;
     out vec3 fNormal;
     out vec2 fUv;
-    out vec3 fTangent;
-    out vec3 fBitangent;
-
 
     out vec3 fDirLight;
     out vec3 fCamPos;
@@ -42,14 +37,11 @@ function getBasicVertex() {
         fDirLight = normalize(lightDirection);
         fCamPos = camPos;
         fFragPos = fragPos.xyz;
-
-        fTangent = tangent;
-        fBitangent = bitangent;
     }
     `
 }
 
-function getBasicFragment() {
+function getPBRFragment() {
 
     return `#version 300 es
     precision highp float;
@@ -57,10 +49,6 @@ function getBasicFragment() {
     in vec3 fColor;
     in vec3 fNormal;
     in vec2 fUv;
-
-    in vec3 fTangent;
-    in vec3 fBitangent;
-
 
     in vec3 fDirLight;
     in vec3 fCamPos;
@@ -89,7 +77,7 @@ function getBasicFragment() {
             for(int y = -1; y <= 1; ++y)
             {
                 float pcfDepth = texture(shadowMap, projectedCoordinates.xy + vec2(x, y) * texelSize).r; 
-                shadow += currentDepth - bias > pcfDepth ? 0.5 : 0.0;        
+                shadow += currentDepth - bias > pcfDepth ? 0.7 : 0.0;        
             }    
         }
         shadow /= 9.0;
@@ -113,63 +101,7 @@ function getBasicFragment() {
         float shadow = 1.0 - CalculateShadow();
 
         vec3 finalColor = shadow * text * (dLight + specular);
-
         myOutputColor = vec4(finalColor,1);
-    }
-    
-    `
-}
-
-function getBasicDepthShaderVertex() {
-
-    return `#version 300 es
-    precision highp float;
-
-    in vec3 position;
-    in vec3 color;
-    in vec2 uv;
-    in vec3 normal;
-    in vec3 tangent;
-    in vec3 bitangent;
-
-    out vec3 fColor;
-    out vec3 fNormal;
-    out vec3 fTangent;
-    out vec3 fBitangent;
-    out vec2 fUv;
-
-    uniform mat4 model;
-    uniform mat4 view;
-    uniform mat4 perspective;
-
-    void main() 
-    { 
-        gl_Position = perspective * view * model * vec4(position, 1.0);
-
-        
-        fColor = color;
-        fNormal = normal;
-        fTangent = tangent;
-        fBitangent = bitangent;
-        fUv = uv;
-     }
-    `
-}
-
-function getBasicDepthShaderFragment() {
-
-    return `#version 300 es
-    precision highp float;
-
-    in vec3 fColor;
-    in vec3 fNormal;
-    in vec2 fUv;
-
-    out vec4 myOutputColor;
-
-    void main() 
-    {
-      //  myOutputColor = vec4(1,1,1,1);
     }
     
     `

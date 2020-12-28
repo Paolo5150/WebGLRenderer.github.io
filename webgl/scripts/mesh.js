@@ -19,13 +19,26 @@ class Vertex
         this.normal[0] = 1.0
         this.normal[1] = 1.0
         this.normal[2] = 1.0
+
+        this.tangent = vec3.create()
+        this.tangent[0] = 1.0
+        this.tangent[1] = 1.0
+        this.tangent[2] = 1.0
+
+        this.bitangent = vec3.create()
+        this.bitangent[0] = 1.0
+        this.bitangent[1] = 1.0
+        this.bitangent[2] = 1.0
     }
 
     unpack() {
         return [this.position[0], this.position[1], this.position[2], 
                 this.color[0], this.color[1], this.color[2], 
                 this.uv[0], this.uv[1],
-                this.normal[0], this.normal[1], this.normal[2]];
+                this.normal[0], this.normal[1], this.normal[2],
+                this.tangent[0], this.tangent[1], this.tangent[2],
+                this.bitangent[0], this.bitangent[1], this.bitangent[2],
+            ];
     }
 }
 

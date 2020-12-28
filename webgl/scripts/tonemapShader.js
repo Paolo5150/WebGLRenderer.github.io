@@ -6,10 +6,14 @@ function getTonemapVertex() {
     in vec3 color;
     in vec2 uv;
     in vec3 normal;
+    in vec3 tangent;
+    in vec3 bitangent;
 
     out vec3 fColor;
     out vec3 fNormal;
     out vec2 fUv;    
+    out vec3 fTangent;
+    out vec3 fBitangent;
 
     void main() 
     { 
@@ -17,6 +21,8 @@ function getTonemapVertex() {
         fColor = color;
         fUv = uv;
         fNormal = normal;
+        fTangent = tangent;
+        fBitangent = bitangent;
     }
     `
 }

@@ -50,9 +50,9 @@ function geFloorMaterial(cam) {
 return woodMaterial
 }
 
-function getUnlitMaterial() {
+function getDepthRenderMaterial() {
 
-    var shad = createShaderProgram(getBasicUnlitVertex(), getBasicUnlitFragment())
+    var shad = createShaderProgram(getBasicDepthShaderVertex(), getBasicDepthShaderFragment())
 
     let mat = new Material(shad)
     mat.onPreRender = ()=>{}
