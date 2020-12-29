@@ -48,7 +48,8 @@ function getTextureOnlyShaderFragment() {
 
     void main() 
     {
-        myOutputColor= vec4(texture(uSampler_1, fUv).rgb, 1.0);
+        vec3 c = texture(uSampler_1, fUv).rrr;
+        myOutputColor= vec4(c, 1.0);
 
     }
     

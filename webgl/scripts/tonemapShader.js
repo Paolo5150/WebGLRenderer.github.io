@@ -47,7 +47,7 @@ function getTonemapFragment() {
     {
         vec3 hdrColor = texture(uSampler_1, fUv).rgb;
         vec3 bloomColor = texture(bloomBlur, fUv).rgb;
-        hdrColor += bloomColor; 
+       // hdrColor += bloomColor; 
 
         // exposure tone mapping
         vec3 mapped = vec3(1.0) - exp(-hdrColor * exposure);

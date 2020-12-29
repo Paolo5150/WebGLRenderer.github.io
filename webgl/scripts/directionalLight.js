@@ -12,7 +12,6 @@ class DirectionalLight
 
         this.shadowFrameBuffer = new Framebuffer(2048,2048)
         this.shadowFrameBuffer.addDepthAttachmentFloat()
-        this.shadowFrameBuffer.setNoColor()
 
         this.materialForShadowmap = getDepthRenderMaterial()
 
@@ -27,14 +26,12 @@ class DirectionalLight
         this.specularColor = uiManag.lightSpecularColor
     }
 
-    getLightSpaceMatrix() {
-
-    }
 
     updateShadowMap(rendererObj, time) {
         //Create shadow depth 
         this.shadowFrameBuffer.bind();
-
+        gl.drawBuffers( [gl.NONE]);
+        gl.readBuffer([gl.NONE]);
         var lightNorm = vec3.create()
         lightNorm = vec3.normalize(lightNorm, this.direction)
 
@@ -52,8 +49,12 @@ class DirectionalLight
         this.shadowCam.updateView()
         this.ligthtSpaceMatrix = mat4.mul(this.ligthtSpaceMatrix, this.shadowCam.projection, this.shadowCam.view)
         gl.frontFace(gl.CW)
-        rendererObj.clearAll(0.0,0.0,0.0,1.0)
+        gl.enable(gl.DEPTH_TEST)
+
+        rendererObj.clearAll(0,0,0,1)
+
         rendererObj.renderForceMaterial(this.shadowCam,time, this.materialForShadowmap)
+
         Framebuffer.unbind()
         gl.frontFace(gl.CCW)
     }

@@ -2,7 +2,7 @@ class Renderer
 {
     constructor(width, height)
     {
-        gl.clearColor(1.0,0.0,0.0,1);
+        gl.clearColor(0.0,0.0,0.0,1.0);
         gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
         gl.clearDepth(1.0);
         gl.enable(gl.DEPTH_TEST);
@@ -16,9 +16,9 @@ class Renderer
     }
 
     clearAll(r,g,b,a) {
-        gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
         gl.clearColor(r,g,b,a);
         gl.clearDepth(1.0);
+        gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
     }
 
     addMeshRenderer(meshRenderer)

@@ -7,14 +7,6 @@ class Framebuffer {
         this.height = height
     }
 
-    setNoColor() {
-      gl.bindFramebuffer(gl.FRAMEBUFFER, this.frameBuffer)
-
-      gl.drawBuffers( [gl.NONE]);
-      gl.readBuffer([gl.NONE]);
-
-    }
-
     addColorAttachment( count) {
       gl.bindFramebuffer(gl.FRAMEBUFFER, this.frameBuffer)
 
@@ -74,7 +66,6 @@ class Framebuffer {
     bind() {
       gl.bindFramebuffer(gl.FRAMEBUFFER, this.frameBuffer)
       gl.viewport(0, 0, this.width, this.height);
-      gl.enable(gl.DEPTH_TEST)
 
 
     }

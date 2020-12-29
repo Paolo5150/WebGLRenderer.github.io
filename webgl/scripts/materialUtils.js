@@ -1,5 +1,5 @@
 
-function getWoodMaterial(cam) {
+function getWoodMaterial() {
 
     var basicShader = createShaderProgram(getBasicVertex(), getBasicFragment())
     let text = Texture.FromURL('https://images-wixmp-ed30a86b8c4ca887773594c2.wixmp.com/f/385064a4-77d4-4bb1-927b-2dcf9f0fb658/d1hnki3-3070ff4b-08e2-4ce6-bd29-59dfb277fb0d.jpg/v1/fill/w_600,h_600,q_75,strp/tileable_wood_texture_by_ftourini_stock_d1hnki3-fullview.jpg?token=eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ1cm46YXBwOiIsImlzcyI6InVybjphcHA6Iiwib2JqIjpbW3siaGVpZ2h0IjoiPD02MDAiLCJwYXRoIjoiXC9mXC8zODUwNjRhNC03N2Q0LTRiYjEtOTI3Yi0yZGNmOWYwZmI2NThcL2QxaG5raTMtMzA3MGZmNGItMDhlMi00Y2U2LWJkMjktNTlkZmIyNzdmYjBkLmpwZyIsIndpZHRoIjoiPD02MDAifV1dLCJhdWQiOlsidXJuOnNlcnZpY2U6aW1hZ2Uub3BlcmF0aW9ucyJdfQ.MGgFuUmkYOmpjtHxXXOs19TAXjOpDrUAlCsYteKUwBE')
@@ -10,12 +10,11 @@ function getWoodMaterial(cam) {
     mat.addVec3Uniform("lightDirection", ()=>{return uiManager.lightDir})
     mat.addVec3Uniform("lightDiffuseColor", ()=>{return uiManager.lightDiffuseColor})
     mat.addVec3Uniform("lightSpecularColor", ()=>{return uiManager.lightSpecularColor})
-    mat.addVec3Uniform("camPos", ()=>{return cam.position})
 
     return mat
 }
 
-function getUntexturedMaterial(cam, tint) {
+function getUntexturedMaterial(tint) {
 
     var basicShader = createShaderProgram(getBasicVertex(), getBasicUntexturedFragment())
 
@@ -26,7 +25,7 @@ function getUntexturedMaterial(cam, tint) {
     return mat
 }
 
-function geFloorMaterial(cam) {
+function geFloorMaterial() {
 
     var basicShader = createShaderProgram(getNormalMappedShaderVertex(), getNormalMappedShaderFragment())
     let text = Texture.FromURL('https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcT5Y_hN950Q2m64fWpD6vyx09vHA9sgD2gbUQ&usqp=CAU')
@@ -39,7 +38,6 @@ function geFloorMaterial(cam) {
     mat.addVec3Uniform("lightDirection", ()=>{return uiManager.lightDir})
     mat.addVec3Uniform("lightDiffuseColor", ()=>{return uiManager.lightDiffuseColor})
     mat.addVec3Uniform("lightSpecularColor", ()=>{return uiManager.lightSpecularColor})
-    mat.addVec3Uniform("camPos", ()=>{return cam.position})
 
     return mat
 }
@@ -56,7 +54,7 @@ function getDepthRenderMaterial() {
 
 
 
-function getPBRMaterial(cam) {
+function getPBRMaterial() {
 
     var basicShader = createShaderProgram(getPBRShaderVertex(), getPBRShaderFragment())
 
@@ -77,7 +75,6 @@ function getPBRMaterial(cam) {
     mat.addVec3Uniform("lightDirection", ()=>{return uiManager.lightDir})
     mat.addVec3Uniform("lightDiffuseColor", ()=>{return uiManager.lightDiffuseColor})
     mat.addVec3Uniform("lightSpecularColor", ()=>{return uiManager.lightSpecularColor})
-    mat.addVec3Uniform("camPos", ()=>{return cam.position})
 
 
 return mat
