@@ -15,17 +15,7 @@ var cameraDistance = 10
 var deer = null
 var cube = null
 
-var shadowCameraSize = 4
-let shadowCamera = Camera.ortho(-shadowCameraSize,shadowCameraSize,-shadowCameraSize,shadowCameraSize,0.1,60)
-
-shadowCamera.position = [0,0,10]
-shadowCamera.updateView()
-
-
-//Shadow frame buffera
-var shadowFrameBuf = new Framebuffer(2048,2048)
-shadowFrameBuf.addDepthAttachmentFloat()
-shadowFrameBuf.setNoColor()
+let directionalLight = new DirectionalLight()
 
 //Post process framebuffers
 var regularSceneFrameBuffer = new Framebuffer(canvas.width, canvas.height)
@@ -65,41 +55,22 @@ $( document ).ready(function() {
 
 var textureOnlyShader = createShaderProgram(getTextureOnlyShaderVertex(), getTextureOnlyShaderFragment())
 let textureOnlyMaterial = new Material(textureOnlyShader)
-textureOnlyMaterial.addTexture("uSampler_1",brightnessFrameBuf.attachments['color0'])
+textureOnlyMaterial.addTexture("uSampler_1",directionalLight.shadowFrameBuffer.attachments['depth'])
 
 let woodMat = getWoodMaterial(camera)
 let untexturedMat = getUntexturedMaterial(camera, [1,1,1])
 let pbrMat = getPBRMaterial(camera)
-pbrMat.addTexture("shadowMap", shadowFrameBuf.attachments['depth'])
+pbrMat.addTexture("shadowMap", directionalLight.shadowFrameBuffer.attachments['depth'])
 
-let depthRender = getDepthRenderMaterial()
 let floorMat = geFloorMaterial(camera)
-floorMat.addTexture("shadowMap", shadowFrameBuf.attachments['depth'])
-woodMat.addTexture("shadowMap", shadowFrameBuf.attachments['depth'])
+floorMat.addTexture("shadowMap", directionalLight.shadowFrameBuffer.attachments['depth'])
+woodMat.addTexture("shadowMap", directionalLight.shadowFrameBuffer.attachments['depth'])
 
-untexturedMat.addMat4Uniform("lightSpace", ()=>{
-    var ls = mat4.create()
-    ls = mat4.mul(ls, shadowCamera.projection, shadowCamera.view)
-    return ls
-})
-
-pbrMat.addMat4Uniform("lightSpace", ()=>{
-    var ls = mat4.create()
-    ls = mat4.mul(ls, shadowCamera.projection, shadowCamera.view)
-    return ls
-})
-
-floorMat.addMat4Uniform("lightSpace", ()=>{
-        var ls = mat4.create()
-        ls = mat4.mul(ls, shadowCamera.projection, shadowCamera.view)
-        return ls
-    })
-woodMat.addMat4Uniform("lightSpace", ()=>{
-        var ls = mat4.create()
-        ls = mat4.mul(ls, shadowCamera.projection, shadowCamera.view)
-        return ls
-
-    })
+//Add lightSpace to materials so they receive shadows
+untexturedMat.addMat4Uniform("lightSpace", ()=>{return directionalLight.ligthtSpaceMatrix })
+pbrMat.addMat4Uniform("lightSpace", ()=>{return directionalLight.ligthtSpaceMatrix})
+floorMat.addMat4Uniform("lightSpace", ()=>{return directionalLight.ligthtSpaceMatrix })
+woodMat.addMat4Uniform("lightSpace", ()=>{return directionalLight.ligthtSpaceMatrix  })
 
 let textureViewer = new MeshRenderer(getQuadMesh(), textureOnlyMaterial)
 textureViewer.scale = [0.3,0.7,1.0]
@@ -176,31 +147,8 @@ var render = function(time) {
 
 
 
-    //Create shadow depth 
-    shadowFrameBuf.bind();
-
-    var lightNorm = vec3.create()
-    lightNorm = vec3.normalize(lightNorm, uiManager.lightDir)
-
-    lightNorm[0] *=-1 * shadowCamera.farPlane *0.5
-    lightNorm[1] *=-1* shadowCamera.farPlane *0.5
-    lightNorm[2] *=-1* shadowCamera.farPlane *0.5
-
-    var toLight = vec3.create()
-    toLight = vec3.add(toLight, [0,1.5,0], lightNorm);
-
-    //randomQuad.position = toLightd
-    shadowCamera.position = toLight
-    shadowCamera.target = [0,1.5,0]
-
-    shadowCamera.updateView()
-
-    renderer.clearAll(0,0,0,1)
-    gl.frontFace(gl.CW)
-
-    renderer.renderForceMaterial(shadowCamera,time, depthRender)
-    Framebuffer.unbind()
-    gl.frontFace(gl.CCW)
+    directionalLight.updateLightFromUI(uiManager)
+    directionalLight.updateShadowMap(renderer, time) 
    
     //Render scene to frame buffer
     regularSceneFrameBuffer.bind()
