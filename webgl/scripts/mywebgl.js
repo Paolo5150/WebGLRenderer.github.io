@@ -16,6 +16,7 @@ function loadAll() {
     $.getScript('webgl/scripts/textureOnlyShader.js');
     $.getScript('webgl/scripts/tonemapShader.js');
     $.getScript('webgl/scripts/directionalLight.js');
+    $.getScript('webgl/scripts/bloomEffect.js');
     $.getScript('webgl/scripts/materialUtils.js');
     $.getScript('webgl/scripts/canvas.js');
 

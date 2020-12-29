@@ -22,33 +22,12 @@ var regularSceneFrameBuffer = new Framebuffer(canvas.width, canvas.height)
 regularSceneFrameBuffer.addColorAttachmentFloatFormat( 1)
 regularSceneFrameBuffer.addDepthAttachment()
 
-var bloomSceneFrameBuffer = new Framebuffer(canvas.width, canvas.height)
-bloomSceneFrameBuffer.addColorAttachmentFloatFormat( 1)
-bloomSceneFrameBuffer.addDepthAttachment()
-
-var brightnessFrameBuf = new Framebuffer(canvas.width, canvas.height)
-brightnessFrameBuf.addColorAttachmentFloatFormat( 1)
-
-var blurFrameBuffer = []
-blurFrameBuffer[0] = new Framebuffer(canvas.width, canvas.height)
-blurFrameBuffer[0].addColorAttachmentFloatFormat( 1)
-blurFrameBuffer[1] = new Framebuffer(canvas.width, canvas.height)
-blurFrameBuffer[1].addColorAttachmentFloatFormat( 1)
+var bloomEffect = new BloomEffect(canvas.width, canvas.height)
 
 //Post processing materials and textures
 let hdrPostProcessMaterial = getPostProcessHDRMaterial()
 hdrPostProcessMaterial.addTexture("uSampler_1",regularSceneFrameBuffer.attachments['color0'])
-hdrPostProcessMaterial.addTexture("bloomBlur", blurFrameBuffer[1].attachments['color0'])
-
-let brightnessExtractProcessMaterial = getPostProcessBrightnessExtractMaterial()
-brightnessExtractProcessMaterial.addTexture("uSampler_1",bloomSceneFrameBuffer.attachments['color0'])
-
-let blurProcessMaterial = getPostProcessBlurMaterial()
-blurProcessMaterial.addTexture("uSampler_1",brightnessFrameBuf.attachments['color0'])
-blurProcessMaterial.addFloatUniform("textureSizeX",  ()=>{return canvas.width})
-blurProcessMaterial.addFloatUniform("textureSizeY",  ()=>{return canvas.height})
-blurProcessMaterial.addFloatUniform("horizontal",  ()=>{return 1.0})
-
+hdrPostProcessMaterial.addTexture("bloomBlur", bloomEffect.blurFrameBuffer[1].attachments['color0'])
 
 
 $( document ).ready(function() {
@@ -145,8 +124,6 @@ var render = function(time) {
     if(deer != null)
         deer.rotation[1] += delta * 20
 
-
-
     directionalLight.updateLightFromUI(uiManager)
     directionalLight.updateShadowMap(renderer, time) 
    
@@ -155,37 +132,8 @@ var render = function(time) {
     renderer.clearAll(0,0,0,1)        
     renderer.render(camera,time)
 
-    //Render objects that will have bloom
-    bloomSceneFrameBuffer.bind()
-    renderer.clearAll(0,0,0,1)        
-    if(cube != null)
-        renderer.renderMeshRenderer(camera,time, cube)
-
-    //Create texture with extracted brightness
-    brightnessFrameBuf.bind()
-    renderer.clearAll(0,0,0,1)        
-    renderer.renderMeshRendererForceMaterial(camera,time,screenQuad, brightnessExtractProcessMaterial)
-
-
-    //Blur
-    var hor = 1.0
-    for(var i=0; i< 4; i++) {
-        blurFrameBuffer[i % 2].bind()
-        renderer.clearAll(0,0,0,1)
-
-        if(i==0)
-            blurProcessMaterial.addTexture("uSampler_1",brightnessFrameBuf.attachments['color0'])
-        else
-             blurProcessMaterial.addTexture("uSampler_1",blurFrameBuffer[1 - (i % 2)].attachments['color0'])
-        
-        blurProcessMaterial.addFloatUniform("horizontal",  ()=>{return hor})
-        renderer.renderMeshRendererForceMaterial(camera,time,screenQuad, blurProcessMaterial)
-    
-        hor = hor === 1.0 ? 0.0 : 1.0  
-    }
+    bloomEffect.update(renderer, camera, time,cube)
    
-
-    
     //Quad to screen
     Framebuffer.unbind()
     renderer.clearAll(0,0,0,1)       
