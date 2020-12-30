@@ -119,7 +119,7 @@ var render = function(time) {
 
     renderer.render(camera.camObj,time)
 
-    bloomEffect.update(renderer, camera.camObj, time,cube)
+    //bloomEffect.update(renderer, camera.camObj, time,cube)
    
     //Quad to screen
     Framebuffer.unbind()
