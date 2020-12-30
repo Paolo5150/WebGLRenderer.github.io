@@ -16,6 +16,7 @@ function getNormalMappedShaderVertex() {
     out vec3 fFragPosTBN;
     out vec3 fCamPosTBN;
     out vec3 fLightDirTBN;
+    out vec3 fLightPositionTBN;
 
     out vec3 fDirLight;
     out vec3 fCamPos;
@@ -23,6 +24,8 @@ function getNormalMappedShaderVertex() {
     out vec4 fFragPosLightSpace;
 
     uniform vec3 lightDirection;
+    uniform vec3 pointLightPos;
+
     uniform vec3 camPos;
 
     uniform mat4 model;
@@ -55,6 +58,7 @@ function getNormalMappedShaderVertex() {
         fFragPosTBN = TBN * fragPos.xyz;
         fCamPosTBN = TBN * camPos;
         fLightDirTBN = TBN * fDirLight;
+        fLightPositionTBN = TBN * pointLightPos;
 
     }
     `
@@ -77,9 +81,16 @@ function getNormalMappedShaderFragment() {
     in vec3 fFragPosTBN;
     in vec3 fCamPosTBN;
     in vec3 fLightDirTBN;
+    in vec3 fLightPositionTBN;
 
     uniform vec3 lightDiffuseColor;
     uniform vec3 lightSpecularColor;
+    uniform float dirLightIntensity;
+
+    uniform vec3 pointLightDiffuseColor;
+    uniform vec3 pointLightSpecularColor;
+    uniform float pointLightIntensity;
+
     uniform sampler2D uSampler_1;
     uniform sampler2D shadowMap;
     uniform sampler2D normalMap;
@@ -100,7 +111,7 @@ function getNormalMappedShaderFragment() {
             for(int y = -1; y <= 1; ++y)
             {
                 float pcfDepth = texture(shadowMap, projectedCoordinates.xy + vec2(x, y) * texelSize).r; 
-                shadow += currentDepth - bias > pcfDepth ? 0.7 : 0.0;        
+                shadow += currentDepth - bias > pcfDepth ? dirLightIntensity / 1.2 : 0.0;        
             }    
         }
         shadow /= 9.0;
@@ -113,21 +124,34 @@ function getNormalMappedShaderFragment() {
 
         vec3 nMap = normalize(texture(normalMap, fUv).rgb * 2.0 - 1.0);
 
-
+        // Dirrectional light
         float dirLightFactor = max(0.1,dot(nMap, -normalize(fLightDirTBN)));
-        vec3 dLight = lightDiffuseColor * dirLightFactor;
-
+        vec3 dLight = lightDiffuseColor * dirLightFactor * dirLightIntensity;
 
         vec3 viewDir = normalize(fCamPosTBN - fFragPosTBN);
         vec3 reflectDir = reflect(normalize(fLightDirTBN), nMap);
         float spec = pow(max(dot(viewDir, reflectDir), 0.0), 128.0);
-        vec3 specular = spec * lightSpecularColor;
+        vec3 dLightSpecular = spec * lightSpecularColor * dirLightIntensity;
+
+        //Point light
+        vec3 lightToFrag = fFragPosTBN - fLightPositionTBN;
+        float distance = length(lightToFrag);
+        float attenuation = pointLightIntensity / (1.0+ 0.09 * distance + 0.032 * (distance * distance));
+        float pointLightFactor = max(0.1,dot(normalize(nMap), normalize(-lightToFrag)));
+        vec3 pLight = pointLightDiffuseColor * pointLightFactor * attenuation;
+
+        reflectDir = reflect(normalize(lightToFrag), nMap);
+        spec = pow(max(dot(viewDir, reflectDir), 0.0), 128.0);
+        vec3 pLightSpecular = spec * pointLightDiffuseColor * attenuation;
+        
+        vec3 allLights = dLight + dLightSpecular + pLight + pLightSpecular;
 
         vec3 text = texture(uSampler_1, fUv).rgb;
 
-        float shadow = 1.0 - CalculateShadow();
+        float shadow = (1.0 - CalculateShadow());
 
-        vec3 finalColor = shadow * text * (dLight + specular);
+
+        vec3 finalColor = shadow * text * allLights;
 
         myOutputColor = vec4(finalColor,1);
     }

@@ -44,13 +44,22 @@ function getTextureOnlyShaderFragment() {
     in vec2 fUv;
 
     uniform sampler2D uSampler_1;
+    uniform float isDepth;
     out vec4 myOutputColor;
 
     void main() 
     {
-        vec3 c = texture(uSampler_1, fUv).rrr;
-        myOutputColor= vec4(c, 1.0);
+        vec3 c;
+        if(isDepth == 1.0)
+        {
+            c = texture(uSampler_1, fUv).rrr;
+        }
+        else
+        {
+            c = texture(uSampler_1, fUv).rgb;
+        }
 
+        myOutputColor= vec4(c, 1.0);
     }
     
     `

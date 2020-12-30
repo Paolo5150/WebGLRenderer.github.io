@@ -5,7 +5,7 @@ class DirectionalLight
         this.diffuseColor = vec3.create()
         this.specularColor = vec3.create()
 
-        this.shadowCameraSize = 4
+        this.shadowCameraSize = 5
         this.shadowCam = Camera.ortho(-this.shadowCameraSize,this.shadowCameraSize,-this.shadowCameraSize,this.shadowCameraSize,0.1,60)
         this.shadowCam.position = [0,0,10]
         this.shadowCam.updateView()
@@ -17,6 +17,9 @@ class DirectionalLight
 
         this.ligthtSpaceMatrix = mat4.create()
         this.ligthtSpaceMatrix = mat4.mul(this.ligthtSpaceMatrix, this.shadowCam.projection, this.shadowCam.view)
+
+        //List of mesh renderer to be rendered in the shadowmap
+        this.shadowCasters = []
  
     }
 
@@ -53,7 +56,8 @@ class DirectionalLight
 
         rendererObj.clearAll(0,0,0,1)
 
-        rendererObj.renderForceMaterial(this.shadowCam,time, this.materialForShadowmap)
+        for(var i=0; i < this.shadowCasters.length; i++)
+            rendererObj.renderMeshRendererForceMaterial(this.shadowCam,time, this.shadowCasters[i], this.materialForShadowmap)
 
         Framebuffer.unbind()
         gl.frontFace(gl.CCW)

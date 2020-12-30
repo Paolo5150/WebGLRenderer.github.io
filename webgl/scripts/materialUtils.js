@@ -10,6 +10,13 @@ function getWoodMaterial() {
     mat.addVec3Uniform("lightDirection", ()=>{return uiManager.lightDir})
     mat.addVec3Uniform("lightDiffuseColor", ()=>{return uiManager.lightDiffuseColor})
     mat.addVec3Uniform("lightSpecularColor", ()=>{return uiManager.lightSpecularColor})
+    mat.addFloatUniform("dirLightIntensity", ()=>{return uiManager.dirLightIntensity})
+
+    mat.addVec3Uniform("pointLightPos", ()=>{return uiManager.lightPos})
+    mat.addVec3Uniform("pointLightDiffuseColor", ()=>{return [1,1,1]})
+    mat.addVec3Uniform("pointLightSpecularColor", ()=>{return [1,1,1]})
+    mat.addFloatUniform("pointLightIntensity", ()=>{return uiManager.pLightIntensity})
+    
 
     return mat
 }
@@ -38,6 +45,12 @@ function geFloorMaterial() {
     mat.addVec3Uniform("lightDirection", ()=>{return uiManager.lightDir})
     mat.addVec3Uniform("lightDiffuseColor", ()=>{return uiManager.lightDiffuseColor})
     mat.addVec3Uniform("lightSpecularColor", ()=>{return uiManager.lightSpecularColor})
+    mat.addFloatUniform("dirLightIntensity", ()=>{return uiManager.dirLightIntensity})
+
+    mat.addVec3Uniform("pointLightPos", ()=>{return uiManager.lightPos})
+    mat.addVec3Uniform("pointLightDiffuseColor", ()=>{return [1,1,1]})
+    mat.addVec3Uniform("pointLightSpecularColor", ()=>{return [1,1,1]})
+    mat.addFloatUniform("pointLightIntensity", ()=>{return uiManager.pLightIntensity})
 
     return mat
 }
@@ -75,7 +88,12 @@ function getPBRMaterial() {
     mat.addVec3Uniform("lightDirection", ()=>{return uiManager.lightDir})
     mat.addVec3Uniform("lightDiffuseColor", ()=>{return uiManager.lightDiffuseColor})
     mat.addVec3Uniform("lightSpecularColor", ()=>{return uiManager.lightSpecularColor})
+    mat.addFloatUniform("dirLightIntensity", ()=>{return uiManager.dirLightIntensity})
 
+    mat.addVec3Uniform("pointLightPos", ()=>{return uiManager.lightPos})
+    mat.addVec3Uniform("pointLightDiffuseColor", ()=>{return [1,1,1]})
+    mat.addVec3Uniform("pointLightSpecularColor", ()=>{return [1,1,1]})
+    mat.addFloatUniform("pointLightIntensity", ()=>{return uiManager.pLightIntensity})
 
 return mat
 }

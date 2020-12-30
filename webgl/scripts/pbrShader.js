@@ -16,12 +16,16 @@ function getPBRShaderVertex() {
     out vec3 fFragPosTBN;
     out vec3 fCamPosTBN;
     out vec3 fLightDirTBN;
+    out vec3 fPointLightDirTBN;
 
     out vec3 fDirLight;
     out vec3 fCamPos;
     out vec3 fFragPos;
     out vec4 fFragPosLightSpace;
+    out vec3 fLightPositionTBN;
+    out vec3 fLightPosition;
 
+    uniform vec3 pointLightPos;
     uniform vec3 lightDirection;
     uniform vec3 camPos;
 
@@ -53,6 +57,9 @@ function getPBRShaderVertex() {
         fFragPosTBN = TBN * fragPos.xyz;
         fCamPosTBN = TBN * camPos;
         fLightDirTBN = TBN * fDirLight;
+        fLightPositionTBN = TBN * pointLightPos;
+        fLightPosition = pointLightPos;
+        fPointLightDirTBN = normalize(TBN * (fragPos.xyz - pointLightPos));
 
     }
     `
@@ -76,8 +83,17 @@ function getPBRShaderFragment() {
     in vec3 fCamPosTBN;
     in vec3 fLightDirTBN;
 
+    in vec3 fLightPositionTBN;
+    in vec3 fLightPosition;
+    in vec3 fPointLightDirTBN;
+
     uniform vec3 lightDiffuseColor;
     uniform vec3 lightSpecularColor;
+    uniform float dirLightIntensity;
+
+    uniform vec3 pointLightDiffuseColor;
+    uniform vec3 pointLightSpecularColor;
+    uniform float pointLightIntensity;
 
     uniform sampler2D  albedoMap;
     uniform sampler2D metallicMap;
@@ -95,6 +111,7 @@ function getPBRShaderFragment() {
     float GeometrySchlickGGX(float NdotV, float roughness);
     float GeometrySmith(vec3 N, vec3 V, vec3 L, float roughness);
     vec3 fresnelSchlick(float cosTheta, vec3 F0);
+    vec3 DoPBRStuff(vec3 V, vec3 L, vec3 diffuse, float intensity, vec3 N, vec3 F0, float metallic, vec3 albedo, float roughness);
 
     float CalculateShadow()
     {
@@ -111,13 +128,14 @@ function getPBRShaderFragment() {
             for(int y = -1; y <= 1; ++y)
             {
                 float pcfDepth = texture(shadowMap, projectedCoordinates.xy + vec2(x, y) * texelSize).r; 
-                shadow += currentDepth - bias > pcfDepth ? 0.7 : 0.0;        
+                shadow += currentDepth - bias > pcfDepth ? dirLightIntensity / 1.2 : 0.0;         
             }    
         }
         shadow /= 9.0;
 
         return shadow;        
     }
+
 
     void main() 
     {
@@ -133,27 +151,17 @@ function getPBRShaderFragment() {
 
         vec3 F0 = vec3(0.04); 
         F0 = mix(F0, albedo, metallic);
+        vec3 L = normalize(-fLightDirTBN);
         vec3 Lo = vec3(0.0);
 
-        vec3 L = normalize(-fLightDirTBN);
-        vec3 H = normalize(V + L);
-        float lightIntensity = 1.0;
-        vec3 radiance = lightDiffuseColor * lightIntensity;
-        
-        float NDF = DistributionGGX(N, H, roughness);
-		float G   = GeometrySmith(N, V, L, roughness);      
-        vec3 F    = fresnelSchlick(max(dot(H, V), 0.0), F0);
+        Lo += DoPBRStuff(V, L, lightDiffuseColor, dirLightIntensity, N, F0, metallic, albedo, roughness);
 
-        vec3 kS = F;
-        vec3 kD = vec3(1.0) - kS;
-        kD *= 1.0 - metallic;
-		
-		vec3 numerator    = NDF * G * F;
-        float denominator = 4.0 * max(dot(N, V), 0.0) * max(dot(N, L), 0.0);
-        vec3 specular     = numerator / max(denominator, 0.001);
-		
-		float NdotL = max(dot(N, L), 0.0);                
-        Lo += (kD * albedo / PI + specular) * radiance * NdotL;
+        vec3 lightToFrag = fFragPos - fLightPosition;
+        float distance = length(lightToFrag);
+        float attenuation = pointLightIntensity / (1.0+ 0.09 * distance + 0.032 * (distance * distance));
+
+        Lo += DoPBRStuff(V, -fPointLightDirTBN, pointLightDiffuseColor, attenuation, N, F0, metallic, albedo, roughness);
+
 
         vec3 ambient = vec3(0.03) * albedo * ao;
         vec3 col = ambient + Lo;
@@ -203,6 +211,31 @@ function getPBRShaderFragment() {
         float ggx1  = GeometrySchlickGGX(NdotL, roughness);
         
         return ggx1 * ggx2;
+    }
+
+    vec3 DoPBRStuff(vec3 V, vec3 L, vec3 diffuse, float intensity, vec3 N, vec3 F0, float metallic, vec3 albedo, float roughness)
+    {
+        vec3 res = vec3(0.0);
+
+        vec3 H = normalize(V + L);
+        vec3 radiance = diffuse * intensity;
+        
+        float NDF = DistributionGGX(N, H, roughness);
+		float G   = GeometrySmith(N, V, L, roughness);      
+        vec3 F    = fresnelSchlick(max(dot(H, V), 0.0), F0);
+
+        vec3 kS = F;
+        vec3 kD = vec3(1.0) - kS;
+        kD *= 1.0 - metallic;
+		
+		vec3 numerator    = NDF * G * F;
+        float denominator = 4.0 * max(dot(N, V), 0.0) * max(dot(N, L), 0.0);
+        vec3 specular     = numerator / max(denominator, 0.001);
+		
+		float NdotL = max(dot(N, L), 0.0);                
+        res = (kD * albedo / PI + specular) * radiance * NdotL;
+
+        return res;
     }
 
 

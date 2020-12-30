@@ -17,18 +17,18 @@ var regularSceneFrameBuffer = new Framebuffer(canvas.width, canvas.height)
 regularSceneFrameBuffer.addColorAttachmentFloatFormat( 1)
 regularSceneFrameBuffer.addDepthAttachment()
 
-//var bloomEffect = new BloomEffect(canvas.width, canvas.height)
+var bloomEffect = new BloomEffect(canvas.width, canvas.height)
 
 //Post processing materials and textures
 let hdrPostProcessMaterial = getPostProcessHDRMaterial()
 hdrPostProcessMaterial.addTexture("uSampler_1",regularSceneFrameBuffer.attachments['color0'])
-//hdrPostProcessMaterial.addTexture("bloomBlur", bloomEffect.blurFrameBuffer[1].attachments['color0'])
+hdrPostProcessMaterial.addTexture("bloomBlur", bloomEffect.blurFrameBuffer[1].attachments['color0'])
 
 Framebuffer.unbind()
 
 $( document ).ready(function() {
 
-let textureViewer = new TextureViewer([-0.8,0.0,0.0],[0.3,0.7,1.0], directionalLight.shadowFrameBuffer.attachments['depth'] )
+let textureViewer = new TextureViewer([-0.8,-0.3,0.0],[0.3,0.7,1.0], directionalLight.shadowFrameBuffer.attachments['depth'], true)
 
 let woodMat = getWoodMaterial()
 woodMat.addVec3Uniform("camPos", ()=>{return camera.camObj.position})
@@ -62,21 +62,32 @@ loadOBJ("webgl/models/cubic.obj").then((value) => {
         let meshR = new MeshRenderer(value,untexturedMat)
         meshR.position = [-2,4,2]
         meshR.rotation = [0,0,0]
+        meshR.scale = [0.4,0.4,0.4]
+
+        let m2 = new MeshRenderer(value,woodMat)
+        m2.position = [2,4,-2]
+        m2.rotation = [0,0,0]
 
         renderer.addMeshRenderer(meshR)
+
+        renderer.addMeshRenderer(m2)
+        directionalLight.shadowCasters.push(m2)
         cube = meshR
     }
 })
 
+
 loadOBJ("webgl/models/deer.obj").then((value) => {
     if(value != undefined)
     {
-        let meshR = new MeshRenderer(value,pbrMat)
+        let meshR = new MeshRenderer(value,woodMat)
         meshR.position = [0,0,0]
         meshR.scale = [0.01,0.01,0.01]
         meshR.rotation = [0,0,0]
 
         renderer.addMeshRenderer(meshR)
+        directionalLight.shadowCasters.push(meshR)
+
         deer = meshR
     }
 })
@@ -95,6 +106,9 @@ var render = function(time) {
     if(deer != null)
         deer.rotation[1] += delta * 20
 
+    if(cube != null)
+        cube.position = uiManager.lightPos
+
     directionalLight.updateLightFromUI(uiManager)
     directionalLight.updateShadowMap(renderer, time) 
    
@@ -105,11 +119,10 @@ var render = function(time) {
 
     renderer.render(camera.camObj,time)
 
-    //bloomEffect.update(renderer, camera.camObj, time,cube)
+    bloomEffect.update(renderer, camera.camObj, time,cube)
    
     //Quad to screen
     Framebuffer.unbind()
-    gl.disable(gl.DEPTH_TEST)
     renderer.clearAll(0,0,0,1)      
 
     gl.viewport(0, 0, canvas.width, canvas.height);

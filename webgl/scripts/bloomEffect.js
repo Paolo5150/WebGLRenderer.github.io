@@ -29,16 +29,28 @@ class BloomEffect
 
         this.screenQuad = new MeshRenderer(getQuadMesh(), this.brightnessExtractProcessMaterial)
 
+        this.untexturedMat = getUntexturedMaterial([0,0,0])
+
     }
 
     update(rendererObj, camera, time, cube) {
         this.bloomSceneFrameBuffer.bind()
+        gl.enable(gl.DEPTH_TEST)
 
-        rendererObj.clearAll(0,0,0,1)        
+        //This is a bit of a hack
+        // I want to apply bloom only to the point light cube,
+        // so i render the entire scene first with a black tint, then render the cube with the light color
+        rendererObj.clearAll(0,0,0,1)
+        this.untexturedMat.addVec3Uniform("tint", ()=>{return [0,0,0]})
+        rendererObj.renderForceMaterial(camera,time, this.untexturedMat)
+        this.untexturedMat.addVec3Uniform("tint", ()=>{return [1,1,1]})
         if(cube != null)
-            rendererObj.renderMeshRenderer(camera,time, cube)
+        renderer.renderMeshRendererForceMaterial(camera,time,cube, this.untexturedMat)
+    
+
 
         bloomEffect.brightnessFrameBuf.bind()
+        gl.disable(gl.DEPTH_TEST)
         renderer.clearAll(0,0,0,1)        
         renderer.renderMeshRendererForceMaterial(camera,time,this.screenQuad, this.brightnessExtractProcessMaterial)
 

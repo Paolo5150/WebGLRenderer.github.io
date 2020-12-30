@@ -31,7 +31,6 @@ function getBasicVertex() {
 
     void main() 
     { 
-
         vec4 fragPos = model * vec4(position, 1.0);
 
         fColor = color;
@@ -66,6 +65,13 @@ function getBasicFragment() {
 
     uniform vec3 lightDiffuseColor;
     uniform vec3 lightSpecularColor;
+    uniform float dirLightIntensity;
+
+    uniform vec3 pointLightPos;
+    uniform vec3 pointLightDiffuseColor;
+    uniform vec3 pointLightSpecularColor;
+    uniform float pointLightIntensity;
+
     uniform sampler2D uSampler_1;
     uniform sampler2D shadowMap;
     out vec4 myOutputColor;
@@ -85,7 +91,7 @@ function getBasicFragment() {
             for(int y = -1; y <= 1; ++y)
             {
                 float pcfDepth = texture(shadowMap, projectedCoordinates.xy + vec2(x, y) * texelSize).r; 
-                shadow += currentDepth - bias > pcfDepth ? 0.5 : 0.0;        
+                shadow += currentDepth - bias > pcfDepth ? dirLightIntensity / 1.2 : 0.0;       
             }    
         }
         shadow /= 9.0;
@@ -95,20 +101,33 @@ function getBasicFragment() {
 
     void main() 
     {
+        //Directional light
         float dirLightFactor = max(0.1,dot(normalize(fNormal), -fDirLight));
-        vec3 dLight = lightDiffuseColor * dirLightFactor;
-
+        vec3 dLight = lightDiffuseColor * dirLightFactor * dirLightIntensity;
 
         vec3 viewDir = normalize(fCamPos - fFragPos);
         vec3 reflectDir = reflect(fDirLight, fNormal);
         float spec = pow(max(dot(viewDir, reflectDir), 0.0), 258.0);
-        vec3 specular = spec * lightSpecularColor;
+        vec3 dLightSpecular = spec * lightSpecularColor * dirLightIntensity;
+
+        //Point light
+        vec3 lightToFrag = fFragPos - pointLightPos;
+        float distance = length(lightToFrag);
+        float attenuation = pointLightIntensity / (1.0+ 0.09 * distance + 0.032 * (distance * distance));
+        float pointLightFactor = max(0.1,dot(normalize(fNormal), normalize(-lightToFrag)));
+        vec3 pLight = pointLightDiffuseColor * pointLightFactor * attenuation;
+
+        reflectDir = reflect(normalize(lightToFrag), fNormal);
+        spec = pow(max(dot(viewDir, reflectDir), 0.0), 128.0);
+        vec3 pLightSpecular = spec * pointLightDiffuseColor * attenuation;
+        
+        vec3 allLights = dLight + dLightSpecular + pLight + pLightSpecular;
 
         vec3 text = texture(uSampler_1, fUv).rgb;
 
         float shadow = 1.0 - CalculateShadow();
 
-        vec3 finalColor = shadow * text * (dLight + specular);
+        vec3 finalColor = shadow * text * allLights;
 
         myOutputColor = vec4(finalColor,1);
     }
@@ -138,7 +157,6 @@ function getBasicUntexturedFragment() {
     {
 
         vec3 finalColor = tint;
-
         myOutputColor = vec4(finalColor,1);
     }
     
