@@ -101,6 +101,7 @@ function getPBRShaderFragment() {
     uniform sampler2D roughnessMap;
     uniform sampler2D aoMap;
     uniform sampler2D shadowMap;
+    uniform sampler2D heightMap;
 
 
     out vec4 myOutputColor;
@@ -112,6 +113,7 @@ function getPBRShaderFragment() {
     float GeometrySmith(vec3 N, vec3 V, vec3 L, float roughness);
     vec3 fresnelSchlick(float cosTheta, vec3 F0);
     vec3 DoPBRStuff(vec3 V, vec3 L, vec3 diffuse, float intensity, vec3 N, vec3 F0, float metallic, vec3 albedo, float roughness);
+    vec2 ParallaxMapping(vec2 texCoords, vec3 viewDir);
 
     float CalculateShadow()
     {
@@ -140,14 +142,15 @@ function getPBRShaderFragment() {
     void main() 
     {
 
-        
-        vec3 albedo     = pow(texture(albedoMap, fUv).rgb, vec3(2.2));
-        float metallic  =  texture(metallicMap, fUv).r;
-        float roughness     =  texture(roughnessMap, fUv).r;
-        float ao        =  texture(aoMap, fUv).r;
-
-        vec3 N = normalize(texture(normalMap, fUv).rgb * 2.0 - 1.0);
         vec3 V = normalize(fCamPosTBN - fFragPosTBN);
+        vec2 texCoords = ParallaxMapping(fUv, V);
+
+        vec3 albedo     = pow(texture(albedoMap, texCoords).rgb, vec3(2.2));
+        float metallic  =  texture(metallicMap, texCoords).r;
+        float roughness     =  texture(roughnessMap, texCoords).r;
+        float ao        =  texture(aoMap, texCoords).r;
+
+        vec3 N = normalize(texture(normalMap, texCoords).rgb * 2.0 - 1.0);
 
         vec3 F0 = vec3(0.04); 
         F0 = mix(F0, albedo, metallic);
@@ -159,6 +162,7 @@ function getPBRShaderFragment() {
         vec3 lightToFrag = fFragPos - fLightPosition;
         float distance = length(lightToFrag);
         float attenuation = pointLightIntensity / (1.0+ 0.09 * distance + 0.032 * (distance * distance));
+        attenuation = pointLightIntensity / (distance * distance);
 
         Lo += DoPBRStuff(V, -fPointLightDirTBN, pointLightDiffuseColor, attenuation, N, F0, metallic, albedo, roughness);
 
@@ -166,12 +170,21 @@ function getPBRShaderFragment() {
         vec3 ambient = vec3(0.03) * albedo * ao;
         vec3 col = ambient + Lo;
 
+        col = col / (col + vec3(1.0));
+        col = pow(col, vec3(1.0/2.2));
 
         float shadow = 1.0 - CalculateShadow();
 
         vec3 finalColor = shadow * col;
 
         myOutputColor = vec4(finalColor,1);
+    }
+
+    vec2 ParallaxMapping(vec2 texCoords, vec3 viewDir)
+    { 
+        float height =  texture(heightMap, texCoords).r;    
+        vec2 p = viewDir.xy / viewDir.z * (height * 0.0);
+        return texCoords - p;    
     }
 
     float DistributionGGX(vec3 N, vec3 H, float roughness)

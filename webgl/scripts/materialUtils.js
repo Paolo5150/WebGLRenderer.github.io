@@ -71,18 +71,20 @@ function getPBRMaterial() {
 
     var basicShader = createShaderProgram(getPBRShaderVertex(), getPBRShaderFragment())
 
-    let albedo = Texture.FromURL('webgl/pbr/Bamboo/albedo.png')
-    let metallic = Texture.FromURL('webgl/pbr/Bamboo/metallic.png')
-    let normal = Texture.FromURL('webgl/pbr/Bamboo/normal.png')
-    let  roughness = Texture.FromURL('webgl/pbr/Bamboo/roughness.png')
-    let ao = Texture.FromURL('webgl/pbr/Bamboo/ao.png')
+    let albedo = Texture.FromURL('webgl/pbr/MahogFloor/albedo.png')
+    let metallic = Texture.FromURL('webgl/pbr/MahogFloor/metallic.psd')
+    let normal = Texture.FromURL('webgl/pbr/MahogFloor/normal.png')
+   // let  roughness = Texture.FromURL('webgl/pbr/Floor/roughness.png')
+    let ao = Texture.FromURL('webgl/pbr/MahogFloor/ao.png')
+   // let hMap = Texture.FromURL('webgl/pbr/MahogFloor/height.png')
 
     let mat = new Material(basicShader)
     mat.addTexture("albedoMap",albedo)
     mat.addTexture("metallicMap",metallic)
     mat.addTexture("normalMap",normal)
     mat.addTexture("aoMap",ao)
-    mat.addTexture("roughnessMap",roughness)
+    //mat.addTexture("roughnessMap",roughness)
+   // mat.addTexture("heightMap",hMap)
 
 
     mat.addVec3Uniform("lightDirection", ()=>{return uiManager.lightDir})

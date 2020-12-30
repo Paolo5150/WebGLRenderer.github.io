@@ -100,7 +100,7 @@ function getExtractBrightnessFragment() {
     {
         vec3 finalColor = texture(uSampler_1, fUv).rgb;
   
-        float brightness = dot(finalColor.rgb, vec3(0.2126, 0.7152, 0.0722));
+        float brightness = dot(finalColor.rgb, vec3(0.7126, 0.7152, 0.0722));
         if(brightness > 1.0)
             FragColor = vec4(finalColor.rgb, 1.0);
         else

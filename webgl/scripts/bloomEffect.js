@@ -56,7 +56,7 @@ class BloomEffect
 
         //Blur
         var hor = 1.0
-        for(var i=0; i< 4; i++) {
+        for(var i=0; i< 2; i++) {
             this.blurFrameBuffer[i % 2].bind()
             rendererObj.clearAll(0,0,0,1)
 

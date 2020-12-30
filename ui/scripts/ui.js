@@ -14,7 +14,7 @@ class UIManager {
 
         //Point light
         this.lightPos = vec3.create()
-        this.lightPos = [0,5,0]
+        this.lightPos = [0,0.8,0]
         this.pLightIntensity = 1.0
 
         this.gamma = 0.8

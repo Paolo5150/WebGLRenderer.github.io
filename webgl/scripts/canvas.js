@@ -38,7 +38,7 @@ woodMat.addMat4Uniform("lightSpace", ()=>{return directionalLight.ligthtSpaceMat
 let untexturedMat = getUntexturedMaterial([1,1,1])
 untexturedMat.addMat4Uniform("lightSpace", ()=>{return directionalLight.ligthtSpaceMatrix })
 
-let pbrMat = getPBRMaterial(camera)
+let pbrMat = getPBRMaterial()
 pbrMat.addTexture("shadowMap", directionalLight.shadowFrameBuffer.attachments['depth'])
 pbrMat.addVec3Uniform("camPos", ()=>{return camera.camObj.position})
 pbrMat.addMat4Uniform("lightSpace", ()=>{return directionalLight.ligthtSpaceMatrix})
@@ -50,7 +50,7 @@ floorMat.addMat4Uniform("lightSpace", ()=>{return directionalLight.ligthtSpaceMa
 
 
 let screenQuad = new MeshRenderer(getQuadMesh(), hdrPostProcessMaterial)
-let floor = new MeshRenderer(getQuadMesh(), floorMat)
+let floor = new MeshRenderer(getQuadMesh(), pbrMat)
 floor.rotation[0] = -90
 floor.position = [0,0,-1]
 floor.scale = [15,15,15]
@@ -77,10 +77,10 @@ loadOBJ("webgl/models/cubic.obj").then((value) => {
 })
 
 
-loadOBJ("webgl/models/deer.obj").then((value) => {
+loadOBJ("webgl/models/Deer.obj").then((value) => {
     if(value != undefined)
     {
-        let meshR = new MeshRenderer(value,woodMat)
+        let meshR = new MeshRenderer(value,pbrMat)
         meshR.position = [0,0,0]
         meshR.scale = [0.01,0.01,0.01]
         meshR.rotation = [0,0,0]
@@ -119,7 +119,7 @@ var render = function(time) {
 
     renderer.render(camera.camObj,time)
 
-    //bloomEffect.update(renderer, camera.camObj, time,cube)
+    bloomEffect.update(renderer, camera.camObj, time,cube)
    
     //Quad to screen
     Framebuffer.unbind()
