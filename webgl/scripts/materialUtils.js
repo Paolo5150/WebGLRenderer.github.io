@@ -6,6 +6,7 @@ function getWoodMaterial() {
 
 
     let mat = new Material(basicShader)
+    mat.name = "Wood material"
     mat.addTexture("uSampler_1",text)
     mat.addVec3Uniform("lightDirection", ()=>{return uiManager.lightDir})
     mat.addVec3Uniform("lightDiffuseColor", ()=>{return uiManager.lightDiffuseColor})
@@ -27,6 +28,8 @@ function getUntexturedMaterial(tint) {
 
 
     let mat = new Material(basicShader)
+    mat.name = "Untextured material"
+
     mat.addVec3Uniform("tint", ()=>{return tint})
 
     return mat
@@ -39,6 +42,8 @@ function geFloorMaterial() {
     let textNormalMap = Texture.FromURL('https://images-wixmp-ed30a86b8c4ca887773594c2.wixmp.com/f/14354e63-49e5-4ff6-a0aa-88619b1ca5e3/d90plz3-5fa8674f-73b4-47b9-8a02-26a87d3d0c26.png?token=eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ1cm46YXBwOiIsImlzcyI6InVybjphcHA6Iiwib2JqIjpbW3sicGF0aCI6IlwvZlwvMTQzNTRlNjMtNDllNS00ZmY2LWEwYWEtODg2MTliMWNhNWUzXC9kOTBwbHozLTVmYTg2NzRmLTczYjQtNDdiOS04YTAyLTI2YTg3ZDNkMGMyNi5wbmcifV1dLCJhdWQiOlsidXJuOnNlcnZpY2U6ZmlsZS5kb3dubG9hZCJdfQ.ydTIGrQHFicUICxKLys73hXlxYF0Y8y2BNCXWbddW2s')
 
     let mat = new Material(basicShader)
+    mat.name = "Floor material"
+
     mat.addTexture("uSampler_1",text)
     mat.addTexture("normalMap", textNormalMap)
 
@@ -60,6 +65,8 @@ function getDepthRenderMaterial() {
     var shad = createShaderProgram(getBasicDepthShaderVertex(), getBasicDepthShaderFragment())
 
     let mat = new Material(shad)
+    mat.name = "Depth render material"
+
     mat.onPreRender = ()=>{}
 
     return mat
@@ -79,6 +86,8 @@ function getPBRMaterial() {
    // let hMap = Texture.FromURL('webgl/pbr/MahogFloor/height.png')
 
     let mat = new Material(basicShader)
+    mat.name = "PBR material"
+
     mat.addTexture("albedoMap",albedo)
     mat.addTexture("metallicMap",metallic)
     mat.addTexture("normalMap",normal)
@@ -105,6 +114,8 @@ function getPostProcessBrightnessExtractMaterial() {
 
 
     let quadMaterial = new Material(tonemapShader)
+    quadMaterial.name = "Brightness extract material"
+
     return quadMaterial
 }
 
@@ -113,6 +124,8 @@ function getPostProcessBasicMaterial() {
 
 
     let quadMaterial = new Material(tonemapShader)
+    quadMaterial.name = "Post process basic material"
+
     return quadMaterial
 }
 
@@ -121,6 +134,8 @@ function getPostProcessBlurMaterial() {
 
 
     let quadMaterial = new Material(tonemapShader)
+    quadMaterial.name = "Post process blur material"
+
     return quadMaterial
 }
 
@@ -129,7 +144,7 @@ function getPostProcessHDRMaterial() {
 
 
     let quadMaterial = new Material(tonemapShader)
-
+    quadMaterial.name = "Tonemap HDR material"
     quadMaterial.addFloatUniform("gamma", ()=>{return uiManager.gamma})
     quadMaterial.addFloatUniform("exposure", ()=>{return uiManager.exposure})
 

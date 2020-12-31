@@ -38,24 +38,18 @@ function getTonemapFragment() {
 
     uniform float gamma;
     uniform float exposure;
-    uniform sampler2D uSampler_1;
-    uniform sampler2D bloomBlur;
+    uniform sampler2D sceneTexture;
 
     out vec4 FragColor;
 
     void main() 
     {
-        vec3 hdrColor = texture(uSampler_1, fUv).rgb;
-        vec3 bloomColor = texture(bloomBlur, fUv).rgb;
-        hdrColor += bloomColor; 
+        vec3 color = texture(sceneTexture, fUv).rgb * exposure;
+        float luminance = dot(color, vec3(0.2126, 0.7152, 0.0722));
+	    float mappedLuminance = (luminance * (1.0 + luminance/(1.0*1.0))) / (1.0 + luminance);
 
-        // exposure tone mapping
-        vec3 mapped = vec3(1.0) - exp(-hdrColor * exposure);
-        
-        // gamma correction 
-        mapped = pow(mapped, vec3(1.0 / gamma));
-
-        FragColor = vec4(mapped, 1.0);
+	    vec3 mappedColor = (mappedLuminance / luminance) * color;
+        FragColor = vec4(pow(mappedColor, vec3(1.0 / gamma)), 1.0);
     }
     
     `

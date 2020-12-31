@@ -2,8 +2,10 @@ class Material {
 
     constructor(shader) {
 
+        this.name = "Unamed material"
         this.shader = shader
         this.textures = []
+        this.cubemaps = []
         this.mat4Uniforms = []
         this.vec3Uniforms = []
         this.floatUniforms = []
@@ -14,6 +16,12 @@ class Material {
     addTexture(uniformName, textureID) {
         
         this.textures[uniformName] = textureID
+
+    }
+
+    addCubeMap(uniformName, textureID) {
+        
+        this.cubemaps[uniformName] = textureID
 
     }
     
@@ -35,20 +43,50 @@ class Material {
 
     }
 
+    static unbind() {
+        gl.useProgram(null)
+        gl.activeTexture(gl.TEXTURE0);
+        gl.bindTexture(gl.TEXTURE_2D, null)
+    }
+
     bind() {
 
         gl.useProgram(this.shader);
-        
-        for(var i=0; i< Object.keys(this.textures).length; i++) {
+        var t = 0;
+        //console.log("Binding MATERIAL " + this.name)
+        if(Object.keys(this.textures).length > 0)
+        {
 
-            var textureLocation = gl.getUniformLocation(this.shader, Object.keys(this.textures)[i]);
-            gl.uniform1i(textureLocation, i);
+            for(var i=0; i< Object.keys(this.textures).length; i++) {
 
-            gl.activeTexture(gl.TEXTURE0 + i);
-            var key = Object.keys(this.textures)[i]
-            this.textures[key].bind()
+                var textureLocation = gl.getUniformLocation(this.shader, Object.keys(this.textures)[i]);
+                gl.uniform1i(textureLocation, t);
+                gl.activeTexture(gl.TEXTURE0 + t);
+                var key = Object.keys(this.textures)[i]
+                this.textures[key].bind()   
+               // console.log("Binding texture " + Object.keys(this.textures)[i] + " loc " + JSON.stringify(textureLocation) + ", ID " + i )
+                t++
 
+
+            }
         }
+
+        if(Object.keys(this.cubemaps).length > 0)
+        {
+            for(var i=0; i< Object.keys(this.cubemaps).length; i++) {
+
+                var textureLocation = gl.getUniformLocation(this.shader, Object.keys(this.cubemaps)[i]);
+                gl.uniform1i(textureLocation, t);    
+                gl.activeTexture(gl.TEXTURE0 + t);
+                var key = Object.keys(this.cubemaps)[i]
+
+               // console.log("Binding CUBEMAP " + Object.keys(this.cubemaps)[i] + " loc " + textureLocation + ", ID " + t )
+
+                this.cubemaps[key].bind()
+    
+                t++;
+            }
+        }   
 
         var mat4uniformKeys = Object.keys(this.mat4Uniforms)
         for(var i=0; i< mat4uniformKeys.length; i++) {

@@ -6,6 +6,8 @@ function loadAll() {
     $.getScript('webgl/scripts/meshRenderer.js');
     $.getScript('webgl/scripts/camera.js');
     $.getScript('webgl/scripts/texture.js');
+    $.getScript('webgl/scripts/cubemap.js');
+
     $.getScript('webgl/scripts/frambuffer.js');
     $.getScript('webgl/scripts/shadeUtils.js');
     $.getScript('webgl/scripts/material.js');

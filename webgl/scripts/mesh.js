@@ -67,6 +67,18 @@ class Mesh
 
     }
 
+    updateVerticesBuffer() {
+        this.verticesArray = this.vertices[0].unpack()
+        for(var i=1; i< this.vertices.length; i++)
+        {
+            this.verticesArray = this.verticesArray.concat(this.vertices[i].unpack())
+        }
+        gl.bindBuffer(gl.ARRAY_BUFFER, this.vertex_buffer);        
+        gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(this.verticesArray), gl.STATIC_DRAW);
+        gl.bindBuffer(gl.ARRAY_BUFFER, null);
+        gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, null);
+    }
+
     bind()
     {
         gl.bindBuffer(gl.ARRAY_BUFFER, this.vertex_buffer);

@@ -127,7 +127,9 @@ function getBasicFragment() {
 
         float shadow = 1.0 - CalculateShadow();
 
-        vec3 finalColor = shadow * text * allLights;
+        vec3 ref = reflect(-normalize(viewDir), normalize(fNormal));
+
+        vec3 finalColor = shadow * text * allLights ;
 
         myOutputColor = vec4(finalColor,1);
     }

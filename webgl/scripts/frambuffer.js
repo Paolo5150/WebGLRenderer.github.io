@@ -52,6 +52,21 @@ class Framebuffer {
 
     }
 
+    addCubeDepthAttachmentFloat() {
+      gl.bindFramebuffer(gl.FRAMEBUFFER, this.frameBuffer)
+
+      var id = "depth"
+      this.attachments[id] = Cubemap.CreateDepthFloat(this.width,this.height)
+      this.attachments[id].bind()
+      for(var i=0; i< 6; i++)
+      {
+        gl.framebufferTexture2D(gl.FRAMEBUFFER, gl.DEPTH_ATTACHMENT, gl.TEXTURE_CUBE_MAP_POSITIVE_X + i, this.attachments[id].textID, 0);
+
+      }
+      gl.bindFramebuffer(gl.FRAMEBUFFER, null)
+
+    }
+
     addDepthAttachment() {
 
       var id = "depth"

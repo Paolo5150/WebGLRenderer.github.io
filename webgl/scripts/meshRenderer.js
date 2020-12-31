@@ -61,7 +61,7 @@ class MeshRenderer
 
     renderForceMaterial(camera, time, material)
     {
-        material.onPreRender()
+      //  material.onPreRender()
         
         //This below needs to be called during rendering
         this.mesh.bind()
@@ -97,7 +97,7 @@ class MeshRenderer
 
     render(camera, time)
     {
-        this.material.onPreRender()
+      //  this.material.onPreRender()
         
         //This below needs to be called during rendering
         this.mesh.bind()

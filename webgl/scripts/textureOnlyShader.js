@@ -42,21 +42,54 @@ function getTextureOnlyShaderFragment() {
     precision highp float;
 
     in vec2 fUv;
+    in vec3 fNormal;
 
-    uniform sampler2D uSampler_1;
+    uniform samplerCube image;
     uniform float isDepth;
     out vec4 myOutputColor;
 
     void main() 
     {
+
         vec3 c;
         if(isDepth == 1.0)
         {
-            c = texture(uSampler_1, fUv).rrr;
+            c = texture(image, normalize(fNormal)).rrr;
         }
         else
         {
-            c = texture(uSampler_1, fUv).rgb;
+            c = texture(image, normalize(fNormal)).rgb;
+        }
+
+        myOutputColor= vec4(c, 1.0);
+    }
+    
+    `
+}
+
+function getTextureOnlyCubicShaderFragment() {
+
+    return `#version 300 es
+    precision highp float;
+
+    in vec2 fUv;
+
+    uniform samplerCube image;
+    uniform float isDepth;
+    uniform vec3 a;
+    out vec4 myOutputColor;
+
+    void main() 
+    {
+
+        vec3 c;
+        if(isDepth == 1.0)
+        {
+            c = texture(image, fUv).rrr;
+        }
+        else
+        {
+            c = texture(image, fUv).rgb;
         }
 
         myOutputColor= vec4(c, 1.0);

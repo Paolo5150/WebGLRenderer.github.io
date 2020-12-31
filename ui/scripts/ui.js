@@ -2,7 +2,7 @@ class UIManager {
     constructor() {
 
         this.lightDir = vec3.create()
-        this.lightDir = [0,-1,-1]
+        this.lightDir = [1,-1,-1]
 
         this.lightDiffuseColor = vec3.create()
         this.lightDiffuseColor = [1,1,1]
@@ -10,11 +10,11 @@ class UIManager {
         this.lightSpecularColor = vec3.create()
         this.lightSpecularColor = [1,1,1]
 
-        this.dirLightIntensity = 0.1
+        this.dirLightIntensity = 0.9
 
         //Point light
         this.lightPos = vec3.create()
-        this.lightPos = [0,0.8,0]
+        this.lightPos = [-5,0.5,-5]
         this.pLightIntensity = 1.0
 
         this.gamma = 0.8

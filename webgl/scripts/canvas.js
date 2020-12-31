@@ -21,14 +21,45 @@ var bloomEffect = new BloomEffect(canvas.width, canvas.height)
 
 //Post processing materials and textures
 let hdrPostProcessMaterial = getPostProcessHDRMaterial()
-hdrPostProcessMaterial.addTexture("uSampler_1",regularSceneFrameBuffer.attachments['color0'])
-hdrPostProcessMaterial.addTexture("bloomBlur", bloomEffect.blurFrameBuffer[1].attachments['color0'])
+hdrPostProcessMaterial.addTexture("sceneTexture",regularSceneFrameBuffer.attachments['color0'])
+//hdrPostProcessMaterial.addTexture("bloomBlur", bloomEffect.blurFrameBuffer[1].attachments['color0'])
 
 Framebuffer.unbind()
 
 $( document ).ready(function() {
 
-let textureViewer = new TextureViewer([-0.8,-0.3,0.0],[0.3,0.7,1.0], directionalLight.shadowFrameBuffer.attachments['depth'], true)
+let cubeMapTest = Cubemap.FromURLs(
+    [
+        {
+            target: gl.TEXTURE_CUBE_MAP_POSITIVE_X,
+            url: 'webgl/skyboxes/ClearSky/right.jpg',
+          },
+          {
+            target: gl.TEXTURE_CUBE_MAP_NEGATIVE_X,
+            url: 'webgl/skyboxes/ClearSky/left.jpg',
+          },
+          {
+            target: gl.TEXTURE_CUBE_MAP_POSITIVE_Y,
+            url: 'webgl/skyboxes/ClearSky/top.jpg',
+          },
+          {
+            target: gl.TEXTURE_CUBE_MAP_NEGATIVE_Y,
+            url: 'webgl/skyboxes/ClearSky/bottom.jpg',
+          },
+          {
+            target: gl.TEXTURE_CUBE_MAP_POSITIVE_Z,
+            url: 'webgl/skyboxes/ClearSky/front.jpg',
+          },
+          {
+            target: gl.TEXTURE_CUBE_MAP_NEGATIVE_Z,
+            url: 'webgl/skyboxes/ClearSky/back.jpg',
+          },
+    ]
+)
+
+let textureViewer = new TextureViewer([-0.8,-0.3,0.0],[0.3,0.7,1.0], regularSceneFrameBuffer.attachments['color0'], false)
+let cubemapTextureViewer = new CubemapTextureViewer([-0.8,-0.3,0.0],[0.3,0.7,1.0], cubeMapTest, "left", false)
+
 
 let woodMat = getWoodMaterial()
 woodMat.addVec3Uniform("camPos", ()=>{return camera.camObj.position})
@@ -70,7 +101,7 @@ loadOBJ("webgl/models/cubic.obj").then((value) => {
 
         renderer.addMeshRenderer(meshR)
 
-        renderer.addMeshRenderer(m2)
+       // renderer.addMeshRenderer(m2)
         directionalLight.shadowCasters.push(m2)
         cube = meshR
     }
@@ -80,7 +111,7 @@ loadOBJ("webgl/models/cubic.obj").then((value) => {
 loadOBJ("webgl/models/Deer.obj").then((value) => {
     if(value != undefined)
     {
-        let meshR = new MeshRenderer(value,pbrMat)
+        let meshR = new MeshRenderer(value,woodMat)
         meshR.position = [0,0,0]
         meshR.scale = [0.01,0.01,0.01]
         meshR.rotation = [0,0,0]
@@ -111,7 +142,7 @@ var render = function(time) {
 
     directionalLight.updateLightFromUI(uiManager)
     directionalLight.updateShadowMap(renderer, time) 
-   
+
     //Render scene to frame buffer
     regularSceneFrameBuffer.bind()
     gl.enable(gl.DEPTH_TEST)
@@ -119,7 +150,8 @@ var render = function(time) {
 
     renderer.render(camera.camObj,time)
 
-    bloomEffect.update(renderer, camera.camObj, time,cube)
+  
+    //bloomEffect.update(renderer, camera.camObj, time,cube)
    
     //Quad to screen
     Framebuffer.unbind()
@@ -129,7 +161,7 @@ var render = function(time) {
     renderer.renderMeshRendererForceMaterial(camera.camObj,time,screenQuad, hdrPostProcessMaterial)
 
     //Texture viewer
-    renderer.renderMeshRenderer(camera.camObj,time,textureViewer.quad)
+    renderer.renderMeshRenderer(camera.camObj,time,cubemapTextureViewer.quad)
 
     window.requestAnimationFrame(render)
 }
