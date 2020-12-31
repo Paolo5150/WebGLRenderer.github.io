@@ -12,6 +12,10 @@ var cube = null
 
 let directionalLight = new DirectionalLight()
 
+var testCubeFrameBuffer = new Framebuffer(1024,1024)
+testCubeFrameBuffer.addCubeDepthAttachmentFloat()
+var depthMat = getDepthRenderMaterial()
+
 //Post process framebuffers
 var regularSceneFrameBuffer = new Framebuffer(canvas.width, canvas.height)
 regularSceneFrameBuffer.addColorAttachmentFloatFormat( 1)
@@ -58,7 +62,7 @@ let cubeMapTest = Cubemap.FromURLs(
 )
 
 let textureViewer = new TextureViewer([-0.8,-0.3,0.0],[0.3,0.7,1.0], regularSceneFrameBuffer.attachments['color0'], false)
-let cubemapTextureViewer = new CubemapTextureViewer([-0.8,-0.3,0.0],[0.3,0.7,1.0], cubeMapTest, "left", false)
+let cubemapTextureViewer = new CubemapTextureViewer([-0.8,-0.3,0.0],[0.3,0.7,1.0], testCubeFrameBuffer.attachments['depth'], "front", true)
 
 
 let woodMat = getWoodMaterial()
@@ -142,6 +146,15 @@ var render = function(time) {
 
     directionalLight.updateLightFromUI(uiManager)
     directionalLight.updateShadowMap(renderer, time) 
+
+
+    //Test cube frameb
+    testCubeFrameBuffer.bind()
+    gl.framebufferTexture2D(gl.FRAMEBUFFER, gl.DEPTH_ATTACHMENT, gl.TEXTURE_CUBE_MAP_POSITIVE_Z , testCubeFrameBuffer.attachments['depth'].textID, 0);
+
+    gl.enable(gl.DEPTH_TEST)
+    renderer.clearAll(0,0,0,1)  
+    renderer.renderForceMaterial(camera.camObj,time, depthMat)
 
     //Render scene to frame buffer
     regularSceneFrameBuffer.bind()
