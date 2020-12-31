@@ -14,6 +14,7 @@ class Camera
         cam.position = vec3.create()
 
         cam.target = vec3.create()
+        cam.view = mat4.create()
         cam.projection = mat4.create()
         mat4.perspective(cam.projection, FOV * 0.0174532925, ratio, near, far)
 
@@ -27,6 +28,7 @@ class Camera
         
         cam.position = vec3.create()
         cam.target = vec3.create()
+        cam.view = mat4.create()
 
         cam.projection = mat4.create()
         cam.projection = mat4.ortho(cam.projection, left, right, bottom, top, near, far)

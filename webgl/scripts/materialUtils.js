@@ -72,6 +72,18 @@ function getDepthRenderMaterial() {
     return mat
 }
 
+function getLinearDepthRenderMaterial() {
+
+    var shad = createShaderProgram(getBasicDepthShaderVertex(), getBasicDepthShaderLinearizedFragment())
+
+    let mat = new Material(shad)
+    mat.name = "Depth render material"
+
+    mat.onPreRender = ()=>{}
+
+    return mat
+}
+
 
 
 function getPBRMaterial() {

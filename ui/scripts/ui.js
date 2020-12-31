@@ -14,7 +14,7 @@ class UIManager {
 
         //Point light
         this.lightPos = vec3.create()
-        this.lightPos = [-5,0.5,-5]
+        this.lightPos = [1.6,3.5,1.3]
         this.pLightIntensity = 1.0
 
         this.gamma = 0.8
@@ -54,25 +54,25 @@ function hexToRgb(hex) {
 function onLightDirectionChange(e){
     
     if(e === 'x')
-        uiManager.lightDir[0] = $("#dirLightX").val()
+        uiManager.lightDir[0] = parseFloat($("#dirLightX").val())
 
     if(e === 'y')
-        uiManager.lightDir[1] = $("#dirLightY").val()
+        uiManager.lightDir[1] = parseFloat($("#dirLightY").val())
 
     if(e === 'z')
-        uiManager.lightDir[2] = $("#dirLightZ").val()
+        uiManager.lightDir[2] =parseFloat($("#dirLightZ").val())
 
 }
 
 function onLightPositionChange(e) {
     if(e === 'x')
-        uiManager.lightPos[0] = $("#lightPosX").val()
+        uiManager.lightPos[0] = parseFloat($("#lightPosX").val())
 
     if(e === 'y')
-        uiManager.lightPos[1] = $("#lightPosY").val()
+        uiManager.lightPos[1] = parseFloat($("#lightPosY").val())
 
     if(e === 'z')
-        uiManager.lightPos[2] = $("#lightPosZ").val()
+        uiManager.lightPos[2] = parseFloat($("#lightPosZ").val())
 
 }
 
@@ -91,7 +91,7 @@ function onLightSpecularColorChange() {
 }
 
 function onLightIntensityChange() {
-    var i = $("#lightIntensity").val()
+    var i = parseFloat($("#lightIntensity").val())
 
     uiManager.dirLightIntensity = i
 }
@@ -103,9 +103,9 @@ function onPointLightIntensityChange() {
 }
 
 function onGammaChange(e){
-    uiManager.gamma = $("#gamma").val()
+    uiManager.gamma = parseFloat($("#gamma").val())
 }
 
 function onExposureChange(e){
-    uiManager.exposure = $("#exposure").val()
+    uiManager.exposure = parseFloat($("#exposure").val())
 }

@@ -80,8 +80,6 @@ class Material {
                 gl.activeTexture(gl.TEXTURE0 + t);
                 var key = Object.keys(this.cubemaps)[i]
 
-               // console.log("Binding CUBEMAP " + Object.keys(this.cubemaps)[i] + " loc " + textureLocation + ", ID " + t )
-
                 this.cubemaps[key].bind()
     
                 t++;

@@ -11,9 +11,11 @@ var deer = null
 var cube = null
 
 let directionalLight = new DirectionalLight()
+let pointlLight = new PointLight()
 
 var testCubeFrameBuffer = new Framebuffer(1024,1024)
-testCubeFrameBuffer.addCubeDepthAttachmentFloat()
+testCubeFrameBuffer.addCubeColorAttachment()
+//testCubeFrameBuffer.addCubeDepthAttachmentFloat()
 var depthMat = getDepthRenderMaterial()
 
 //Post process framebuffers
@@ -62,7 +64,7 @@ let cubeMapTest = Cubemap.FromURLs(
 )
 
 let textureViewer = new TextureViewer([-0.8,-0.3,0.0],[0.3,0.7,1.0], regularSceneFrameBuffer.attachments['color0'], false)
-let cubemapTextureViewer = new CubemapTextureViewer([-0.8,-0.3,0.0],[0.3,0.7,1.0], testCubeFrameBuffer.attachments['depth'], "front", true)
+let cubemapTextureViewer = new CubemapTextureViewer([-0.8,-0.3,0.0],[0.3,0.7,1.0], pointlLight.shadowFrameBuffer.attachments['depth'], "left", true)
 
 
 let woodMat = getWoodMaterial()
@@ -77,6 +79,7 @@ let pbrMat = getPBRMaterial()
 pbrMat.addTexture("shadowMap", directionalLight.shadowFrameBuffer.attachments['depth'])
 pbrMat.addVec3Uniform("camPos", ()=>{return camera.camObj.position})
 pbrMat.addMat4Uniform("lightSpace", ()=>{return directionalLight.ligthtSpaceMatrix})
+pbrMat.addCubeMap("pShadowMap", pointlLight.shadowFrameBuffer.attachments['depth'])
 
 let floorMat = geFloorMaterial()
 floorMat.addVec3Uniform("camPos", ()=>{return camera.camObj.position})
@@ -100,13 +103,14 @@ loadOBJ("webgl/models/cubic.obj").then((value) => {
         meshR.scale = [0.4,0.4,0.4]
 
         let m2 = new MeshRenderer(value,woodMat)
-        m2.position = [2,4,-2]
+        m2.position = [2,2,-2]
         m2.rotation = [0,0,0]
 
         renderer.addMeshRenderer(meshR)
 
-       // renderer.addMeshRenderer(m2)
+        renderer.addMeshRenderer(m2)
         directionalLight.shadowCasters.push(m2)
+        pointlLight.shadowCasters.push(m2)
         cube = meshR
     }
 })
@@ -122,6 +126,7 @@ loadOBJ("webgl/models/Deer.obj").then((value) => {
 
         renderer.addMeshRenderer(meshR)
         directionalLight.shadowCasters.push(meshR)
+        pointlLight.shadowCasters.push(meshR)
 
         deer = meshR
     }
@@ -139,7 +144,7 @@ var render = function(time) {
     camera.update(delta)
 
     if(deer != null)
-        deer.rotation[1] += delta * 20
+        deer.rotation[1] += delta * 0
 
     if(cube != null)
         cube.position = uiManager.lightPos
@@ -147,14 +152,9 @@ var render = function(time) {
     directionalLight.updateLightFromUI(uiManager)
     directionalLight.updateShadowMap(renderer, time) 
 
+    pointlLight.updateLightFromUI(uiManager)
+    pointlLight.updateShadowMap(renderer, time)
 
-    //Test cube frameb
-    testCubeFrameBuffer.bind()
-    gl.framebufferTexture2D(gl.FRAMEBUFFER, gl.DEPTH_ATTACHMENT, gl.TEXTURE_CUBE_MAP_POSITIVE_Z , testCubeFrameBuffer.attachments['depth'].textID, 0);
-
-    gl.enable(gl.DEPTH_TEST)
-    renderer.clearAll(0,0,0,1)  
-    renderer.renderForceMaterial(camera.camObj,time, depthMat)
 
     //Render scene to frame buffer
     regularSceneFrameBuffer.bind()

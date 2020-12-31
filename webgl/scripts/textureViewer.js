@@ -33,10 +33,10 @@ class CubemapTextureViewer{
 
         if(target == 'back')
         {
-            this.quad.mesh.vertices[0].normal = [-1,-1,-1]
-            this.quad.mesh.vertices[1].normal = [1,-1,-1]
-            this.quad.mesh.vertices[2].normal = [1,1,-1]
-            this.quad.mesh.vertices[3].normal = [-1,1,-1]
+            this.quad.mesh.vertices[0].normal = [1,1,-1]
+            this.quad.mesh.vertices[1].normal = [-1,1,-1]
+            this.quad.mesh.vertices[2].normal = [-1,-1,-1]
+            this.quad.mesh.vertices[3].normal = [1,-1,-1]
         }
         if(target == 'front')
         {
@@ -47,31 +47,31 @@ class CubemapTextureViewer{
         }
         if(target == 'left')
         {
-            this.quad.mesh.vertices[0].normal = [-1,-1,-1]
-            this.quad.mesh.vertices[1].normal = [-1,-1,1]
-            this.quad.mesh.vertices[2].normal = [-1,1,1]
-            this.quad.mesh.vertices[3].normal = [-1,1,-1]
+            this.quad.mesh.vertices[0].normal = [-1,1,-1]
+            this.quad.mesh.vertices[1].normal = [-1,1,1]
+            this.quad.mesh.vertices[2].normal = [-1,-1,1]
+            this.quad.mesh.vertices[3].normal = [-1,-1,-1]
         }
         if(target == 'right')
         {
-            this.quad.mesh.vertices[0].normal = [1,-1,1]
-            this.quad.mesh.vertices[1].normal = [1,-1,-1]
-            this.quad.mesh.vertices[2].normal = [1,1,-1]
-            this.quad.mesh.vertices[3].normal = [1,1,1]
+            this.quad.mesh.vertices[0].normal = [1,1,1]
+            this.quad.mesh.vertices[1].normal = [1,1,-1]
+            this.quad.mesh.vertices[2].normal = [1,-1,-1]
+            this.quad.mesh.vertices[3].normal = [1,-1,1]
         }
         if(target == 'top')
         {
-            this.quad.mesh.vertices[3].normal = [-1,1,-1]
-            this.quad.mesh.vertices[2].normal = [1,1,-1]
-            this.quad.mesh.vertices[1].normal = [1,1,1]
-            this.quad.mesh.vertices[0].normal = [-1,1,1]
+            this.quad.mesh.vertices[3].normal = [-1,1,1]
+            this.quad.mesh.vertices[2].normal = [1,1,1]
+            this.quad.mesh.vertices[1].normal = [1,1,-1]
+            this.quad.mesh.vertices[0].normal = [-1,1,-1]
         }
         if(target == 'bottom')
         {
-            this.quad.mesh.vertices[0].normal = [-1,-1,-1]
-            this.quad.mesh.vertices[1].normal = [1,-1,-1]
-            this.quad.mesh.vertices[2].normal = [1,-1,1]
-            this.quad.mesh.vertices[3].normal = [-1,-1,1]
+            this.quad.mesh.vertices[0].normal = [-1,-1,1]
+            this.quad.mesh.vertices[1].normal = [1,-1,1]
+            this.quad.mesh.vertices[2].normal = [1,-1,-1]
+            this.quad.mesh.vertices[3].normal = [-1,-1,-1]
         }
         
 

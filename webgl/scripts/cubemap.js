@@ -66,8 +66,33 @@ class Cubemap
         return t
     }
 
+    static CreateEmpty(widh, height) {
+        let t = new Cubemap()
+
+        gl.bindTexture(gl.TEXTURE_CUBE_MAP, t.textID);
+
+        for(var i=0; i< 6; i++)
+        {
+            const level = 0;
+            const internalFormat = gl.RGBA;
+            const border = 0;
+            const type = gl.UNSIGNED_BYTE
+            const data = null;
+            gl.texImage2D(gl.TEXTURE_CUBE_MAP_POSITIVE_X + i, level, internalFormat, widh, height, border, gl.RGBA, type, data);
+            
+            // set the filtering so we don't need mips
+            gl.texParameteri(gl.TEXTURE_CUBE_MAP, gl.TEXTURE_MIN_FILTER, gl.NEAREST);
+            gl.texParameteri(gl.TEXTURE_CUBE_MAP, gl.TEXTURE_MAG_FILTER, gl.NEAREST);
+            gl.texParameteri(gl.TEXTURE_CUBE_MAP, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE);
+            gl.texParameteri(gl.TEXTURE_CUBE_MAP, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
+            gl.texParameteri(gl.TEXTURE_CUBE_MAP, gl.TEXTURE_WRAP_R, gl.CLAMP_TO_EDGE);
+        }
+        gl.bindTexture(gl.TEXTURE_CUBE_MAP, null);
+        
+        return t
+    }
+
     bind() {
         gl.bindTexture(gl.TEXTURE_CUBE_MAP, this.textID);
-
     }
 }

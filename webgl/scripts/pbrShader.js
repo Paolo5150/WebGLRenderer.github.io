@@ -95,6 +95,8 @@ function getPBRShaderFragment() {
     uniform vec3 pointLightSpecularColor;
     uniform float pointLightIntensity;
 
+
+
     uniform sampler2D  albedoMap;
     uniform sampler2D metallicMap;
     uniform sampler2D normalMap;
@@ -102,6 +104,7 @@ function getPBRShaderFragment() {
     uniform sampler2D aoMap;
     uniform sampler2D shadowMap;
     uniform sampler2D heightMap;
+    uniform samplerCube pShadowMap;
 
 
     out vec4 myOutputColor;
@@ -136,6 +139,24 @@ function getPBRShaderFragment() {
         shadow /= 9.0;
 
         return shadow;        
+    }
+
+    float PLCalculateShadow()
+    {
+       
+        vec3 fragToLight = fFragPos - fLightPosition;
+
+        float closestDepth = texture(pShadowMap, normalize(fragToLight)).r;
+
+        closestDepth *= 50.0;
+
+        float currentDepth = length(fragToLight);
+
+        float bias = 0.001; 
+
+        float shadow = currentDepth -  bias > closestDepth ? pointLightIntensity / 1.6 : 0.0;
+    
+        return shadow;       
     }
 
 
@@ -174,8 +195,9 @@ function getPBRShaderFragment() {
         col = pow(col, vec3(1.0/2.2));
 
         float shadow = 1.0 - CalculateShadow();
+        float shadowPL = 1.0 - PLCalculateShadow();
 
-        vec3 finalColor = shadow * col;
+        vec3 finalColor = (shadowPL * shadow) * col;
 
         myOutputColor = vec4(finalColor,1);
     }

@@ -14,6 +14,7 @@ function getTextureOnlyShaderVertex() {
     out vec3 fNormal;
     out vec3 fTangent;
     out vec3 fBitangent;
+    out vec3 fFragPos;
 
     uniform mat4 model;
     uniform mat4 view;
@@ -30,6 +31,7 @@ function getTextureOnlyShaderVertex() {
         fNormal = normal;
         fTangent = tangent;
         fBitangent = bitangent;
+        fFragPos = fragPos.xyz;
 
 
     }
@@ -85,6 +87,7 @@ function getTextureOnlyCubicShaderFragment() {
         vec3 c;
         if(isDepth == 1.0)
         {
+
             c = texture(image, fUv).rrr;
         }
         else

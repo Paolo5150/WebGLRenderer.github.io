@@ -74,6 +74,7 @@ function getBasicFragment() {
 
     uniform sampler2D uSampler_1;
     uniform sampler2D shadowMap;
+
     out vec4 myOutputColor;
 
     float CalculateShadow()
@@ -129,6 +130,7 @@ function getBasicFragment() {
 
         vec3 ref = reflect(-normalize(viewDir), normalize(fNormal));
 
+
         vec3 finalColor = shadow * text * allLights ;
 
         myOutputColor = vec4(finalColor,1);
@@ -182,6 +184,7 @@ function getBasicDepthShaderVertex() {
     out vec3 fTangent;
     out vec3 fBitangent;
     out vec2 fUv;
+    out vec3 fFragPos;
 
     uniform mat4 model;
     uniform mat4 view;
@@ -197,6 +200,7 @@ function getBasicDepthShaderVertex() {
         fTangent = tangent;
         fBitangent = bitangent;
         fUv = uv;
+        fFragPos = (model * vec4(position, 1.0)).xyz;
      }
     `
 }
@@ -215,6 +219,34 @@ function getBasicDepthShaderFragment() {
     void main() 
     {
       //  myOutputColor = vec4(1,1,1,1);
+    }
+    
+    `
+}
+
+function getBasicDepthShaderLinearizedFragment() {
+
+    return `#version 300 es
+    precision highp float;
+
+    in vec3 fColor;
+    in vec3 fNormal;
+    in vec2 fUv;
+
+    in vec3 fFragPos;
+
+    uniform vec3 lightPos;
+    uniform float farPlane;
+
+    out vec4 myOutputColor;
+
+    void main() 
+    {
+        float lightDistance = length(fFragPos.xyz - lightPos);
+        
+        lightDistance = lightDistance / farPlane;
+        
+        gl_FragDepth = lightDistance;
     }
     
     `
