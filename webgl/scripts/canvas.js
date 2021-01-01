@@ -13,8 +13,6 @@ var cube = null
 var skybox = null
 var equirectCube = null
 
-let testText = null
-
 
 let cubeMapTest = Cubemap.FromURLs(
   [
@@ -48,9 +46,6 @@ let cubeMapTest = Cubemap.FromURLs(
 let directionalLight = new DirectionalLight()
 let pointlLight = new PointLight()
 
-var shad = createShaderProgram(getEquirectVertex(), getEquirectFragment())
-let equirectMat = new Material(shad)
-
 //Post process framebuffers
 var regularSceneFrameBuffer = new Framebuffer(canvas.width, canvas.height)
 regularSceneFrameBuffer.addColorAttachmentFloatFormat( 1)
@@ -68,19 +63,29 @@ Framebuffer.unbind()
 $( document ).ready(function() {
 
 
+pbrTools.createBDRFTexture(renderer,camera, 0)
+
+let textureViewer = new TextureViewer([-0.8,-0.3,0.0],[0.3,0.7,1.0], pbrTools.bdrfFBO.attachments['color0'], false)
+//let cubemapTextureViewer = new CubemapTextureViewer([-0.8,-0.3,0.0],[0.3,0.7,1.0], pbrTools.frameBuffer.attachments['color0'], "left", false)
+
+let pbrMat = getPBRMaterial()
+pbrMat.addTexture("shadowMap", directionalLight.shadowFrameBuffer.attachments['depth'])
+pbrMat.addVec3Uniform("camPos", ()=>{return camera.camObj.position})
+pbrMat.addMat4Uniform("lightSpace", ()=>{return directionalLight.ligthtSpaceMatrix})
+pbrMat.addCubeMap("pShadowMap", pointlLight.shadowFrameBuffer.attachments['depth'])
+pbrMat.addCubeMap("irradianceMap", pbrTools.convFBO.attachments['color0'])
+pbrMat.addCubeMap("prefilteredMap", pbrTools.preFilteredFBO.attachments['color0'])
+pbrMat.addTexture("bdrf", pbrTools.bdrfFBO.attachments['color0'])
 
 
-//let textureViewer = new TextureViewer([-0.8,-0.3,0.0],[0.3,0.7,1.0], regularSceneFrameBuffer.attachments['color0'], false)
-let cubemapTextureViewer = new CubemapTextureViewer([-0.8,-0.3,0.0],[0.3,0.7,1.0], pbrTools.frameBuffer.attachments['color0'], "left", false)
 
 Texture.FromURLhdr('webgl/skyboxes/HDR/Alexs_Apt_2k.hdr', (loadedTexture)=>{
 //  textureViewer.setTexture(loadedTexture)
 
-  equirectMat.addTexture("equirectangularMap", loadedTexture)
-  pbrTools.renderToCubemap(renderer, 0, equirectCube)
+  pbrTools.renderToCubemap(renderer, 0, equirectCube, loadedTexture)
   skybox = new Skybox(pbrTools.frameBuffer.attachments['color0'], cube) //Pass the cube mesh renderer, the amterial will be overriden
 
-
+  
 })
 
 let woodMat = getWoodMaterial()
@@ -92,11 +97,7 @@ woodMat.addCubeMap("pShadowMap", pointlLight.shadowFrameBuffer.attachments['dept
 let untexturedMat = getUntexturedMaterial([1,1,1])
 untexturedMat.addMat4Uniform("lightSpace", ()=>{return directionalLight.ligthtSpaceMatrix })
 
-let pbrMat = getPBRMaterial()
-pbrMat.addTexture("shadowMap", directionalLight.shadowFrameBuffer.attachments['depth'])
-pbrMat.addVec3Uniform("camPos", ()=>{return camera.camObj.position})
-pbrMat.addMat4Uniform("lightSpace", ()=>{return directionalLight.ligthtSpaceMatrix})
-pbrMat.addCubeMap("pShadowMap", pointlLight.shadowFrameBuffer.attachments['depth'])
+
 
 let floorMat = geFloorMaterial()
 floorMat.addVec3Uniform("camPos", ()=>{return camera.camObj.position})
@@ -119,7 +120,7 @@ loadOBJ("webgl/models/cubic.obj").then((value) => {
         meshR.rotation = [0,0,0]
         meshR.scale = [0.4,0.4,0.4]
 
-        let m2 = new MeshRenderer(value,woodMat)
+        let m2 = new MeshRenderer(value,pbrMat)
         m2.position = [2,2,-2]
         m2.rotation = [0,0,0]
 
@@ -130,9 +131,8 @@ loadOBJ("webgl/models/cubic.obj").then((value) => {
         pointlLight.shadowCasters.push(m2)
         cube = meshR
 
-        equirectCube = new MeshRenderer(value,equirectMat)
+        equirectCube = new MeshRenderer(value,null) // Material set in PBRTools
 
-        let s = new MeshRenderer(value,woodMat)
     }
 })
 
@@ -140,7 +140,7 @@ loadOBJ("webgl/models/cubic.obj").then((value) => {
 loadOBJ("webgl/models/Deer.obj").then((value) => {
     if(value != undefined)
     {
-        let meshR = new MeshRenderer(value,woodMat)
+        let meshR = new MeshRenderer(value,pbrMat)
         meshR.position = [0,0,0]
         meshR.scale = [0.01,0.01,0.01]
         meshR.rotation = [0,0,0]
@@ -195,7 +195,7 @@ var render = function(time) {
     renderer.renderMeshRendererForceMaterial(camera.camObj,time,screenQuad, hdrPostProcessMaterial)
 
     //Texture viewer
-    renderer.renderMeshRenderer(camera.camObj,time,cubemapTextureViewer.quad)
+    renderer.renderMeshRenderer(camera.camObj,time,textureViewer.quad)
 
     window.requestAnimationFrame(render)
 }

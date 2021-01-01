@@ -38,6 +38,8 @@ class Cubemap
         return t
 
     }
+
+   
     
 
     static CreateDepthFloat(widh, height) {
@@ -92,7 +94,7 @@ class Cubemap
         return t
     }
 
-    static CreateEmptyFloat(widh, height) {
+    static CreateEmptyFloat(widh, height, mipMaps = false) {
         let t = new Cubemap()
 
         gl.bindTexture(gl.TEXTURE_CUBE_MAP, t.textID);
@@ -109,11 +111,19 @@ class Cubemap
       
         }
               // set the filtering so we don't need mips
-              gl.texParameteri(gl.TEXTURE_CUBE_MAP, gl.TEXTURE_MIN_FILTER, gl.LINEAR);
+              if(mipMaps)
+                gl.texParameteri(gl.TEXTURE_CUBE_MAP, gl.TEXTURE_MIN_FILTER, gl.LINEAR_MIPMAP_LINEAR);
+                else
+                gl.texParameteri(gl.TEXTURE_CUBE_MAP, gl.TEXTURE_MIN_FILTER, gl.LINEAR);
+
               gl.texParameteri(gl.TEXTURE_CUBE_MAP, gl.TEXTURE_MAG_FILTER, gl.LINEAR);
               gl.texParameteri(gl.TEXTURE_CUBE_MAP, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE);
               gl.texParameteri(gl.TEXTURE_CUBE_MAP, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
               gl.texParameteri(gl.TEXTURE_CUBE_MAP, gl.TEXTURE_WRAP_R, gl.CLAMP_TO_EDGE);
+
+              if(mipMaps)
+              gl.generateMipmap(gl.TEXTURE_CUBE_MAP)
+              
         gl.bindTexture(gl.TEXTURE_CUBE_MAP, null);
         
         return t

@@ -38,7 +38,7 @@ class Renderer
 
         material.bind()
         mr.updateShaderWithMaterialInfoForceMaterial(camera, material)
-        mr.render(camera, time)
+        mr.renderForceMaterial(camera, time, material)
         
     }
 

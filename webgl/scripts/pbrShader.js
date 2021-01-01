@@ -105,15 +105,23 @@ function getPBRShaderFragment() {
     uniform sampler2D shadowMap;
     uniform sampler2D heightMap;
     uniform samplerCube pShadowMap;
+    
+    uniform samplerCube irradianceMap;
+    uniform samplerCube prefilteredMap;
+    uniform sampler2D  bdrf;
 
 
     out vec4 myOutputColor;
 
     //Functions definitions
+    const float MAX_REFLECTION_LOD = 4.0;
+
     float PI = 3.14159265359;
     float DistributionGGX(vec3 N, vec3 H, float roughness);
     float GeometrySchlickGGX(float NdotV, float roughness);
     float GeometrySmith(vec3 N, vec3 V, vec3 L, float roughness);
+    vec3 fresnelSchlickRoughness(float cosTheta, vec3 F0, float roughness);
+
     vec3 fresnelSchlick(float cosTheta, vec3 F0);
     vec3 DoPBRStuff(vec3 V, vec3 L, vec3 diffuse, float intensity, vec3 N, vec3 F0, float metallic, vec3 albedo, float roughness);
     vec2 ParallaxMapping(vec2 texCoords, vec3 viewDir);
@@ -173,7 +181,7 @@ function getPBRShaderFragment() {
 
         vec3 albedo     = pow(texture(albedoMap, texCoords).rgb, vec3(2.2));
         float metallic  =  texture(metallicMap, texCoords).r;
-        float roughness     =  texture(roughnessMap, texCoords).r;
+        float roughness     =  0.0;
         float ao        =  texture(aoMap, texCoords).r;
 
         vec3 N = normalize(texture(normalMap, texCoords).rgb * 2.0 - 1.0);
@@ -193,7 +201,25 @@ function getPBRShaderFragment() {
         Lo += DoPBRStuff(V, -fPointLightDirTBN, pointLightDiffuseColor, attenuation, N, F0, metallic, albedo, roughness);
 
 
-        vec3 ambient = vec3(0.03) * albedo * ao;
+        //Ambient
+
+        vec3 irradiance = texture(irradianceMap, N).rgb;
+        vec3 diffuse    = irradiance * albedo;
+
+
+        vec3 R = reflect(-V, N);   
+        vec3 prefilteredColor = textureLod(prefilteredMap, R,  roughness * MAX_REFLECTION_LOD).rgb;
+        vec3 F        = fresnelSchlickRoughness(max(dot(N, V), 0.0), F0, roughness);
+        vec3 kS = F;
+        vec3 kD = 1.0 - kS;
+        kD *= 1.0 - metallic;
+        vec2 brdfC  = texture(bdrf, vec2(max(dot(N, V), 0.0), roughness)).rg;
+        vec3 specular = prefilteredColor * (F * brdfC.x + brdfC.y);
+
+
+
+        vec3 ambient    = (kD * diffuse + specular) * ao;
+
         vec3 col = ambient + Lo;
 
         col = col / (col + vec3(1.0));
@@ -215,7 +241,7 @@ function getPBRShaderFragment() {
 
         }
 
-        vec3 finalColor = (shadowPL * shadow) * col;
+        vec3 finalColor =  col;
 
         myOutputColor = vec4(finalColor,1);
     }
@@ -245,6 +271,11 @@ function getPBRShaderFragment() {
     {
         return F0 + (1.0 - F0) * pow(1.0 - cosTheta, 5.0);
     }
+
+    vec3 fresnelSchlickRoughness(float cosTheta, vec3 F0, float roughness)
+    {
+        return F0 + (max(vec3(1.0 - roughness), F0) - F0) * pow(max(1.0 - cosTheta, 0.0), 5.0);
+    }  
 
     float GeometrySchlickGGX(float NdotV, float roughness)
     {

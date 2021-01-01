@@ -27,10 +27,50 @@ class PBRTools
         this.frameBuffer.addCubeColorAttachmentFloat()
         this.frameBuffer.addCubeDepthAttachmentFloat()
 
+        this.convFBO = new Framebuffer(32,32)
+        this.convFBO.addCubeColorAttachmentFloat()
+        this.convFBO.addCubeDepthAttachmentFloat()
+
+        this.preFilteredFBO = new Framebuffer(128,128)
+        this.preFilteredFBO.addCubeColorAttachmentFloat(true)
+
+        this.bdrfFBO = new Framebuffer(512,512)
+        this.bdrfFBO.addColorAttachmentFloatRGFormat(1)
+
+        var cubemapShad = createShaderProgram(getEquirectVertex(), getEquirectFragment())
+        this.equirectMat = new Material(cubemapShad)
+
+        var cubeconvollutionShad = createShaderProgram(getEquirectVertex(), getCubemapConvollutionFragment())
+        this.convollutionDiffuseMaterial = new Material(cubeconvollutionShad)
+        this.convollutionDiffuseMaterial.addCubeMap("environmentMap", this.frameBuffer.attachments['color0'])
+
+        var prefilteredShad = createShaderProgram(getEquirectVertex(), getPrefilteredMapFragment())
+        this.prefilteredMapMat = new Material(prefilteredShad)
+        this.prefilteredMapMat.addCubeMap("environmentMap", this.frameBuffer.attachments['color0'])
+        this.prefilteredMapMat.addFloatUniform("roughness", ()=>{return 0.0 })
+
+        var bdrfShad = createShaderProgram(getBDRFVertex(), getBDRFFragment())
+        this.bdrfMat = new Material(bdrfShad)
+
+
+
+
     }
 
-    renderToCubemap(rendererObj, time, equirectCube) {
+    createBDRFTexture(rendererObj, camera, time)
+    {
+        let screenQuad = new MeshRenderer(getQuadMesh(), this.bdrfMat)
+        this.bdrfFBO.bind()
+        gl.drawBuffers([gl.COLOR_ATTACHMENT0])
+        rendererObj.clearAll(0,0,0,1)
+        rendererObj.renderMeshRenderer(camera.camObj,time, screenQuad)
 
+    }
+
+    renderToCubemap(rendererObj, time, equirectCube, hdrTexture) {
+
+        //CreateCubemap
+        this.equirectMat.addTexture("equirectangularMap", hdrTexture)
         this.frameBuffer.bind();
         gl.drawBuffers([gl.COLOR_ATTACHMENT0])
         gl.disable(gl.CULL_FACE)
@@ -40,9 +80,48 @@ class PBRTools
             gl.framebufferTexture2D(gl.FRAMEBUFFER, gl.COLOR_ATTACHMENT0, gl.TEXTURE_CUBE_MAP_POSITIVE_X + i , this.frameBuffer.attachments['color0'].textID, 0);
             gl.enable(gl.DEPTH_TEST)
             rendererObj.clearAll(0,0,0,1)
-            rendererObj.renderMeshRenderer(this.cameras[i],time, equirectCube)
+            rendererObj.renderMeshRendererForceMaterial(this.cameras[i],time, equirectCube, this.equirectMat)
 
         }
+        Framebuffer.unbind()
+        this.frameBuffer.attachments['color0'].bind();
+        gl.generateMipmap(gl.TEXTURE_CUBE_MAP)
+
+        //Create convolluted diffuse
+        this.convFBO.bind();
+        gl.drawBuffers([gl.COLOR_ATTACHMENT0])
+
+        for(var i=0; i < 6; i++)
+        {
+            gl.framebufferTexture2D(gl.FRAMEBUFFER, gl.COLOR_ATTACHMENT0, gl.TEXTURE_CUBE_MAP_POSITIVE_X + i , this.convFBO.attachments['color0'].textID, 0);
+            rendererObj.clearAll(0,0,0,1)
+            rendererObj.renderMeshRendererForceMaterial(this.cameras[i],time, equirectCube, this.convollutionDiffuseMaterial)
+
+        }
+
+        //Create prefiltered map
+        this.preFilteredFBO.bind();
+        gl.drawBuffers([gl.COLOR_ATTACHMENT0])
+
+        var mipCounter = 0
+        for(var mip=0.0; mip < 5.0; mip++)
+        {
+            var mipW = 128 * Math.pow(0.5, mip)
+            var mipH = 128 * Math.pow(0.5, mip)
+            gl.viewport(0, 0, mipW, mipH);
+
+            this.prefilteredMapMat.addFloatUniform("roughness", ()=>{return mip / 4.0 })
+
+            for(var i=0; i < 6; i++)
+            {
+                gl.framebufferTexture2D(gl.FRAMEBUFFER, gl.COLOR_ATTACHMENT0, gl.TEXTURE_CUBE_MAP_POSITIVE_X + i , this.preFilteredFBO.attachments['color0'].textID, mipCounter);
+                rendererObj.clearAll(0,0,0,1)
+                rendererObj.renderMeshRendererForceMaterial(this.cameras[i],time, equirectCube, this.prefilteredMapMat)
+    
+            }  
+            mipCounter++;
+        }
+        
         gl.enable(gl.CULL_FACE)
 
     }
