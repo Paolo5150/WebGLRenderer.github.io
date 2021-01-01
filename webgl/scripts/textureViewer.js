@@ -13,6 +13,11 @@ class TextureViewer{
         this.quad.scale = scale
         this.quad.position = position
     }
+
+    setTexture(texture) {
+        this.textureOnlyMaterial.addTexture("image",texture)
+
+    }
     
 }
 

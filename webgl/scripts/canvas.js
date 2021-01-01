@@ -10,6 +10,10 @@ let camera = new MainCamera()
 var deer = null
 var cube = null
 var skybox = null
+var equirectCube = null
+
+let testText = null
+
 
 let cubeMapTest = Cubemap.FromURLs(
   [
@@ -46,10 +50,6 @@ let pointlLight = new PointLight()
 var shad = createShaderProgram(getEquirectVertex(), getEquirectFragment())
 let equirectMat = new Material(shad)
 
-let hdrImageTest = Texture.FromURL('webgl/skyboxes/HDR/Alexs_Apt_preview.jpg')
-equirectMat.addTexture("equirectangularMap", hdrImageTest)
-
-
 //Post process framebuffers
 var regularSceneFrameBuffer = new Framebuffer(canvas.width, canvas.height)
 regularSceneFrameBuffer.addColorAttachmentFloatFormat( 1)
@@ -69,9 +69,16 @@ $( document ).ready(function() {
 
 
 
-let textureViewer = new TextureViewer([-0.8,-0.3,0.0],[0.3,0.7,1.0], hdrImageTest, false)
+let textureViewer = new TextureViewer([-0.8,-0.3,0.0],[0.3,0.7,1.0], regularSceneFrameBuffer.attachments['color0'], false)
 //let cubemapTextureViewer = new CubemapTextureViewer([-0.8,-0.3,0.0],[0.3,0.7,1.0], pointlLight.shadowFrameBuffer.attachments['depth'], "left", true)
+Texture.FromURLhdr('webgl/skyboxes/HDR/Alexs_Apt_2k.hdr', (loadedTexture)=>{
+  textureViewer.setTexture(loadedTexture)
 
+  equirectMat.addTexture("equirectangularMap", loadedTexture)
+  renderer.addMeshRenderer(equirectCube)
+
+
+})
 
 let woodMat = getWoodMaterial()
 woodMat.addVec3Uniform("camPos", ()=>{return camera.camObj.position})
@@ -119,6 +126,8 @@ loadOBJ("webgl/models/cubic.obj").then((value) => {
         directionalLight.shadowCasters.push(m2)
         pointlLight.shadowCasters.push(m2)
         cube = meshR
+
+        equirectCube = new MeshRenderer(value,equirectMat)
 
         let s = new MeshRenderer(value,woodMat)
         skybox = new Skybox(cubeMapTest, s)

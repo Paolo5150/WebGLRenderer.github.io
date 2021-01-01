@@ -155,6 +155,37 @@ class Texture
         return t
     }
 
+    //onLoad, callback with the texture obj
+    static FromURLhdr(url, onLoad) {
+
+        //Need to get from server
+        $.post("http://localhost:3000/loadImage",  function(result){
+            var hdrInfo = HDRTools.RGBE_ReadHeader(result)
+            var fArray = HDRTools.RGBE_ReadPixels(result, hdrInfo)
+            console.log(hdrInfo)
+            let t = new Texture()
+
+            gl.bindTexture(gl.TEXTURE_2D, t.textID);
+            
+            // define size and format of level 0
+            const level = 0;
+            const internalFormat = gl.RGB16F;
+            const border = 0;
+            const format = gl.RGB;
+            const type = gl.FLOAT
+            const data = null;
+            gl.texImage2D(gl.TEXTURE_2D, level, internalFormat, hdrInfo.width, hdrInfo.height, border, format, type, fArray);
+            
+            // set the filtering so we don't need mips
+            gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR);
+            gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.LINEAR);
+            gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE);
+            gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
+            onLoad(t)
+
+          })
+    }
+
     bind() {
 
         gl.bindTexture(gl.TEXTURE_2D, this.textID);
