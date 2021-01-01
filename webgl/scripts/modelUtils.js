@@ -131,6 +131,15 @@ function getQuadMesh() {
     v1.normal[0] = 0
     v1.normal[1] = 0
     v1.normal[2] = 1
+
+    v1.tangent[0] = 1
+    v1.tangent[1] = 0
+    v1.tangent[2] = 0
+
+    v1.bitangent[0] = 0
+    v1.bitangent[1] = 1
+    v1.bitangent[2] = 0
+
     v1.uv[0] = 0
     v1.uv[1] = 0
 
@@ -138,6 +147,13 @@ function getQuadMesh() {
     v2.normal[0] = 0
     v2.normal[1] = 0
     v2.normal[2] = 1
+    v2.tangent[0] = 1
+    v2.tangent[1] = 0
+    v2.tangent[2] = 0
+
+    v2.bitangent[0] = 0
+    v2.bitangent[1] = 1
+    v2.bitangent[2] = 0
     v2.uv[0] = 1
     v2.uv[1] = 0
 
@@ -145,6 +161,13 @@ function getQuadMesh() {
     v3.normal[0] = 0
     v3.normal[1] = 0
     v3.normal[2] = 1
+    v3.tangent[0] = 1
+    v3.tangent[1] = 0
+    v3.tangent[2] = 0
+
+    v3.bitangent[0] = 0
+    v3.bitangent[1] = 1
+    v3.bitangent[2] = 0
     v3.uv[0] = 1
     v3.uv[1] = 1
 
@@ -154,6 +177,13 @@ function getQuadMesh() {
     v4.normal[2] = 1
     v4.uv[0] = 0
     v4.uv[1] = 1
+    v4.tangent[0] = 1
+    v4.tangent[1] = 0
+    v4.tangent[2] = 0
+
+    v4.bitangent[0] = 0
+    v4.bitangent[1] = 1
+    v4.bitangent[2] = 0
 
     var vs = [v1,v2,v3,v4]
 

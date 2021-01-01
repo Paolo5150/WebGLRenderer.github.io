@@ -109,7 +109,7 @@ let screenQuad = new MeshRenderer(getQuadMesh(), hdrPostProcessMaterial)
 let floor = new MeshRenderer(getQuadMesh(), pbrMat)
 floor.rotation[0] = -90
 floor.position = [0,0,-1]
-floor.scale = [15,15,15]
+floor.scale = [25,25,1]
 renderer.addMeshRenderer(floor)
 
 loadOBJ("webgl/models/cubic.obj").then((value) => {
@@ -120,7 +120,7 @@ loadOBJ("webgl/models/cubic.obj").then((value) => {
         meshR.rotation = [0,0,0]
         meshR.scale = [0.4,0.4,0.4]
 
-        let m2 = new MeshRenderer(value,pbrMat)
+        let m2 = new MeshRenderer(value,woodMat)
         m2.position = [2,2,-2]
         m2.rotation = [0,0,0]
 
@@ -140,7 +140,7 @@ loadOBJ("webgl/models/cubic.obj").then((value) => {
 loadOBJ("webgl/models/Deer.obj").then((value) => {
     if(value != undefined)
     {
-        let meshR = new MeshRenderer(value,pbrMat)
+        let meshR = new MeshRenderer(value,woodMat)
         meshR.position = [0,0,0]
         meshR.scale = [0.01,0.01,0.01]
         meshR.rotation = [0,0,0]
@@ -195,7 +195,7 @@ var render = function(time) {
     renderer.renderMeshRendererForceMaterial(camera.camObj,time,screenQuad, hdrPostProcessMaterial)
 
     //Texture viewer
-    renderer.renderMeshRenderer(camera.camObj,time,textureViewer.quad)
+    //renderer.renderMeshRenderer(camera.camObj,time,textureViewer.quad)
 
     window.requestAnimationFrame(render)
 }
