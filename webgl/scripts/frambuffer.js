@@ -75,9 +75,22 @@ class Framebuffer {
         this.attachments[id].bind()
         for(var i=0; i< 6; i++)
         {
-
           gl.framebufferTexture2D(gl.FRAMEBUFFER, gl.COLOR_ATTACHMENT0, gl.TEXTURE_CUBE_MAP_POSITIVE_X + i, this.attachments[id].textID, 0);
+        }
+    
+      gl.bindFramebuffer(gl.FRAMEBUFFER, null)
 
+    }
+
+    addCubeColorAttachmentFloat( ) {
+      gl.bindFramebuffer(gl.FRAMEBUFFER, this.frameBuffer)
+
+        var id = "color0" 
+        this.attachments[id] = Cubemap.CreateEmptyFloat(this.width, this.height)
+        this.attachments[id].bind()
+        for(var i=0; i< 6; i++)
+        {
+          gl.framebufferTexture2D(gl.FRAMEBUFFER, gl.COLOR_ATTACHMENT0, gl.TEXTURE_CUBE_MAP_POSITIVE_X + i, this.attachments[id].textID, 0);
         }
     
       gl.bindFramebuffer(gl.FRAMEBUFFER, null)

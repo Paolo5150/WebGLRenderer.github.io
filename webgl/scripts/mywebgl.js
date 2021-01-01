@@ -23,6 +23,8 @@ function loadAll() {
     $.getScript('webgl/scripts/directionalLight.js');
     $.getScript('webgl/scripts/pointLight.js');
     $.getScript('webgl/scripts/bloomEffect.js');
+    $.getScript('webgl/scripts/pbrTools.js');
+
     $.getScript('webgl/scripts/mainCamera.js');
     $.getScript('webgl/scripts/skybox.js');
     $.getScript('webgl/scripts/materialUtils.js');

@@ -27,7 +27,7 @@ class CubemapTextureViewer{
     // texture parameter is of type Texture
     //isDepth is actually a float, but a bool can be passed in
     constructor(position, scale, cubemap, target, isDepth = 0.0) {
-        this.textureOnlyShader = createShaderProgram(getTextureOnlyShaderVertex(), getTextureOnlyShaderFragment())
+        this.textureOnlyShader = createShaderProgram(getTextureOnlyShaderVertex(), getTextureOnlyCubicShaderFragment())
         this.textureOnlyMaterial = new Material(this.textureOnlyShader)
         this.textureOnlyMaterial.addCubeMap("image",cubemap)
         this.textureOnlyMaterial.addFloatUniform("isDepth", ()=>{return isDepth})

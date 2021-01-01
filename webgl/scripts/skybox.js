@@ -17,4 +17,10 @@ class Skybox
 
 
     }
+
+    setCubemap(cm)
+    {
+        this.skyboxMat.addCubeMap("cubeMap", cm)
+
+    }
 }

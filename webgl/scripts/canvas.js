@@ -6,6 +6,7 @@ var textureExtensions = gl.getExtension("WEBGL_draw_buffers");
 var colorBufferFloatExtension = this.gl.getExtension('EXT_color_buffer_float');
 let renderer =  new Renderer(canvas.width, canvas.height)
 let camera = new MainCamera()
+let pbrTools = new PBRTools()
 
 var deer = null
 var cube = null
@@ -69,13 +70,15 @@ $( document ).ready(function() {
 
 
 
-let textureViewer = new TextureViewer([-0.8,-0.3,0.0],[0.3,0.7,1.0], regularSceneFrameBuffer.attachments['color0'], false)
-//let cubemapTextureViewer = new CubemapTextureViewer([-0.8,-0.3,0.0],[0.3,0.7,1.0], pointlLight.shadowFrameBuffer.attachments['depth'], "left", true)
+//let textureViewer = new TextureViewer([-0.8,-0.3,0.0],[0.3,0.7,1.0], regularSceneFrameBuffer.attachments['color0'], false)
+let cubemapTextureViewer = new CubemapTextureViewer([-0.8,-0.3,0.0],[0.3,0.7,1.0], pbrTools.frameBuffer.attachments['color0'], "left", false)
+
 Texture.FromURLhdr('webgl/skyboxes/HDR/Alexs_Apt_2k.hdr', (loadedTexture)=>{
-  textureViewer.setTexture(loadedTexture)
+//  textureViewer.setTexture(loadedTexture)
 
   equirectMat.addTexture("equirectangularMap", loadedTexture)
-  renderer.addMeshRenderer(equirectCube)
+  pbrTools.renderToCubemap(renderer, 0, equirectCube)
+  skybox = new Skybox(pbrTools.frameBuffer.attachments['color0'], cube) //Pass the cube mesh renderer, the amterial will be overriden
 
 
 })
@@ -130,7 +133,6 @@ loadOBJ("webgl/models/cubic.obj").then((value) => {
         equirectCube = new MeshRenderer(value,equirectMat)
 
         let s = new MeshRenderer(value,woodMat)
-        skybox = new Skybox(cubeMapTest, s)
     }
 })
 
@@ -193,7 +195,7 @@ var render = function(time) {
     renderer.renderMeshRendererForceMaterial(camera.camObj,time,screenQuad, hdrPostProcessMaterial)
 
     //Texture viewer
-    renderer.renderMeshRenderer(camera.camObj,time,textureViewer.quad)
+    renderer.renderMeshRenderer(camera.camObj,time,cubemapTextureViewer.quad)
 
     window.requestAnimationFrame(render)
 }

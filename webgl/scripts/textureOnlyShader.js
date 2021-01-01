@@ -75,6 +75,7 @@ function getTextureOnlyCubicShaderFragment() {
     precision highp float;
 
     in vec2 fUv;
+    in vec3 fNormal;
 
     uniform samplerCube image;
     uniform float isDepth;
@@ -88,11 +89,11 @@ function getTextureOnlyCubicShaderFragment() {
         if(isDepth == 1.0)
         {
 
-            c = texture(image, fUv).rrr;
+            c = texture(image, normalize(fNormal)).rrr;
         }
         else
         {
-            c = texture(image, fUv).rgb;
+            c = texture(image, normalize(fNormal)).rgb;
         }
 
         myOutputColor= vec4(c, 1.0);
