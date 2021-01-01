@@ -9,14 +9,46 @@ let camera = new MainCamera()
 
 var deer = null
 var cube = null
+var skybox = null
+
+let cubeMapTest = Cubemap.FromURLs(
+  [
+      {
+          target: gl.TEXTURE_CUBE_MAP_POSITIVE_X,
+          url: 'webgl/skyboxes/ClearSky/right.jpg',
+        },
+        {
+          target: gl.TEXTURE_CUBE_MAP_NEGATIVE_X,
+          url: 'webgl/skyboxes/ClearSky/left.jpg',
+        },
+        {
+          target: gl.TEXTURE_CUBE_MAP_POSITIVE_Y,
+          url: 'webgl/skyboxes/ClearSky/top.jpg',
+        },
+        {
+          target: gl.TEXTURE_CUBE_MAP_NEGATIVE_Y,
+          url: 'webgl/skyboxes/ClearSky/bottom.jpg',
+        },
+        {
+          target: gl.TEXTURE_CUBE_MAP_POSITIVE_Z,
+          url: 'webgl/skyboxes/ClearSky/back.jpg',
+        },
+        {
+          target: gl.TEXTURE_CUBE_MAP_NEGATIVE_Z,
+          url: 'webgl/skyboxes/ClearSky/front.jpg',
+        },
+  ]
+)
 
 let directionalLight = new DirectionalLight()
 let pointlLight = new PointLight()
 
-var testCubeFrameBuffer = new Framebuffer(1024,1024)
-testCubeFrameBuffer.addCubeColorAttachment()
-//testCubeFrameBuffer.addCubeDepthAttachmentFloat()
-var depthMat = getDepthRenderMaterial()
+var shad = createShaderProgram(getEquirectVertex(), getEquirectFragment())
+let equirectMat = new Material(shad)
+
+let hdrImageTest = Texture.FromURL('webgl/skyboxes/HDR/Alexs_Apt_preview.jpg')
+equirectMat.addTexture("equirectangularMap", hdrImageTest)
+
 
 //Post process framebuffers
 var regularSceneFrameBuffer = new Framebuffer(canvas.width, canvas.height)
@@ -34,43 +66,18 @@ Framebuffer.unbind()
 
 $( document ).ready(function() {
 
-let cubeMapTest = Cubemap.FromURLs(
-    [
-        {
-            target: gl.TEXTURE_CUBE_MAP_POSITIVE_X,
-            url: 'webgl/skyboxes/ClearSky/right.jpg',
-          },
-          {
-            target: gl.TEXTURE_CUBE_MAP_NEGATIVE_X,
-            url: 'webgl/skyboxes/ClearSky/left.jpg',
-          },
-          {
-            target: gl.TEXTURE_CUBE_MAP_POSITIVE_Y,
-            url: 'webgl/skyboxes/ClearSky/top.jpg',
-          },
-          {
-            target: gl.TEXTURE_CUBE_MAP_NEGATIVE_Y,
-            url: 'webgl/skyboxes/ClearSky/bottom.jpg',
-          },
-          {
-            target: gl.TEXTURE_CUBE_MAP_POSITIVE_Z,
-            url: 'webgl/skyboxes/ClearSky/front.jpg',
-          },
-          {
-            target: gl.TEXTURE_CUBE_MAP_NEGATIVE_Z,
-            url: 'webgl/skyboxes/ClearSky/back.jpg',
-          },
-    ]
-)
 
-let textureViewer = new TextureViewer([-0.8,-0.3,0.0],[0.3,0.7,1.0], regularSceneFrameBuffer.attachments['color0'], false)
-let cubemapTextureViewer = new CubemapTextureViewer([-0.8,-0.3,0.0],[0.3,0.7,1.0], pointlLight.shadowFrameBuffer.attachments['depth'], "left", true)
+
+
+let textureViewer = new TextureViewer([-0.8,-0.3,0.0],[0.3,0.7,1.0], hdrImageTest, false)
+//let cubemapTextureViewer = new CubemapTextureViewer([-0.8,-0.3,0.0],[0.3,0.7,1.0], pointlLight.shadowFrameBuffer.attachments['depth'], "left", true)
 
 
 let woodMat = getWoodMaterial()
 woodMat.addVec3Uniform("camPos", ()=>{return camera.camObj.position})
 woodMat.addTexture("shadowMap", directionalLight.shadowFrameBuffer.attachments['depth'])
 woodMat.addMat4Uniform("lightSpace", ()=>{return directionalLight.ligthtSpaceMatrix  })
+woodMat.addCubeMap("pShadowMap", pointlLight.shadowFrameBuffer.attachments['depth'])
 
 let untexturedMat = getUntexturedMaterial([1,1,1])
 untexturedMat.addMat4Uniform("lightSpace", ()=>{return directionalLight.ligthtSpaceMatrix })
@@ -112,6 +119,9 @@ loadOBJ("webgl/models/cubic.obj").then((value) => {
         directionalLight.shadowCasters.push(m2)
         pointlLight.shadowCasters.push(m2)
         cube = meshR
+
+        let s = new MeshRenderer(value,woodMat)
+        skybox = new Skybox(cubeMapTest, s)
     }
 })
 
@@ -144,7 +154,7 @@ var render = function(time) {
     camera.update(delta)
 
     if(deer != null)
-        deer.rotation[1] += delta * 0
+        deer.rotation[1] += delta * 20
 
     if(cube != null)
         cube.position = uiManager.lightPos
@@ -158,11 +168,11 @@ var render = function(time) {
 
     //Render scene to frame buffer
     regularSceneFrameBuffer.bind()
-    gl.enable(gl.DEPTH_TEST)
+
     renderer.clearAll(0,0,0,1)      
-
     renderer.render(camera.camObj,time)
-
+    if(skybox != null)
+        skybox.render(camera.camObj, time)
   
     //bloomEffect.update(renderer, camera.camObj, time,cube)
    
@@ -174,7 +184,7 @@ var render = function(time) {
     renderer.renderMeshRendererForceMaterial(camera.camObj,time,screenQuad, hdrPostProcessMaterial)
 
     //Texture viewer
-    renderer.renderMeshRenderer(camera.camObj,time,cubemapTextureViewer.quad)
+    renderer.renderMeshRenderer(camera.camObj,time,textureViewer.quad)
 
     window.requestAnimationFrame(render)
 }

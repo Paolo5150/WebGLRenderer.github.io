@@ -15,12 +15,15 @@ function loadAll() {
     $.getScript('webgl/scripts/basicShader.js');
     $.getScript('webgl/scripts/normalMappedShader.js');
     $.getScript('webgl/scripts/pbrShader.js');
+    $.getScript('webgl/scripts/equirectangularShader.js');
+    $.getScript('webgl/scripts/skyboxShader.js');
     $.getScript('webgl/scripts/textureOnlyShader.js');
     $.getScript('webgl/scripts/tonemapShader.js');
     $.getScript('webgl/scripts/directionalLight.js');
     $.getScript('webgl/scripts/pointLight.js');
     $.getScript('webgl/scripts/bloomEffect.js');
     $.getScript('webgl/scripts/mainCamera.js');
+    $.getScript('webgl/scripts/skybox.js');
     $.getScript('webgl/scripts/materialUtils.js');
     $.getScript('webgl/scripts/textureViewer.js');
     $.getScript('webgl/scripts/canvas.js');

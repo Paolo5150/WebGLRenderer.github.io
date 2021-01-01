@@ -65,7 +65,8 @@ class PointLight
         this.shadowFrameBuffer.bind();
         gl.drawBuffers( [gl.NONE]);
         gl.readBuffer([gl.NONE]);
-        var cams = Object.keys(this.cameras)
+        gl.frontFace(gl.CW)
+
         for(var i=0; i < 6; i++)
         {
             gl.framebufferTexture2D(gl.FRAMEBUFFER, gl.DEPTH_ATTACHMENT, gl.TEXTURE_CUBE_MAP_POSITIVE_X + i , this.shadowFrameBuffer.attachments['depth'].textID, 0);
@@ -77,5 +78,7 @@ class PointLight
                 rendererObj.renderMeshRendererForceMaterial(this.cameras[i],time, this.shadowCasters[m], this.materialForShadowmap)
             }
         }
+        gl.frontFace(gl.CCW)
+
     }
 }

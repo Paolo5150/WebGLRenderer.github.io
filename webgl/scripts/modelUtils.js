@@ -11,7 +11,6 @@ async function loadOBJ(pathToFile)
             var gVertices = group.vertices
             var gUvs = group.texCoords
             var gNormals = group.normals
-            console.log(wolf.normals)
 
             gVertices = wolf.vertices
             gUvs = wolf.texCoords

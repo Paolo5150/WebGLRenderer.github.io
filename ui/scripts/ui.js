@@ -10,12 +10,12 @@ class UIManager {
         this.lightSpecularColor = vec3.create()
         this.lightSpecularColor = [1,1,1]
 
-        this.dirLightIntensity = 0.9
+        this.dirLightIntensity = 0.2
 
         //Point light
         this.lightPos = vec3.create()
-        this.lightPos = [1.6,3.5,1.3]
-        this.pLightIntensity = 1.0
+        this.lightPos = [-3.7,5.1,-1.8]
+        this.pLightIntensity = 0.8
 
         this.gamma = 0.8
         this.exposure = 2.0
@@ -34,6 +34,7 @@ class UIManager {
          $("#gamma").val(uiManager.gamma )
          $("#exposure").val(uiManager.exposure )
 
+         $("#lightIntensity").val(this.dirLightIntensity)
 
     }
 }
@@ -97,7 +98,7 @@ function onLightIntensityChange() {
 }
 
 function onPointLightIntensityChange() {
-    var i = $("#pointLightIntensity").val()
+    var i = parseFloat($("#pointLightIntensity").val())
 
     uiManager.pLightIntensity = i
 }

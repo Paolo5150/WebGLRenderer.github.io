@@ -46,7 +46,7 @@ function getTextureOnlyShaderFragment() {
     in vec2 fUv;
     in vec3 fNormal;
 
-    uniform samplerCube image;
+    uniform sampler2D image;
     uniform float isDepth;
     out vec4 myOutputColor;
 
@@ -56,11 +56,11 @@ function getTextureOnlyShaderFragment() {
         vec3 c;
         if(isDepth == 1.0)
         {
-            c = texture(image, normalize(fNormal)).rrr;
+            c = texture(image, fUv).rrr;
         }
         else
         {
-            c = texture(image, normalize(fNormal)).rgb;
+            c = texture(image, vec2(fUv.x, 1.0 - fUv.y)).rgb;
         }
 
         myOutputColor= vec4(c, 1.0);

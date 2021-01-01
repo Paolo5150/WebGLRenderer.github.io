@@ -74,6 +74,8 @@ function getBasicFragment() {
 
     uniform sampler2D uSampler_1;
     uniform sampler2D shadowMap;
+    uniform samplerCube pShadowMap;
+
 
     out vec4 myOutputColor;
 
@@ -96,8 +98,31 @@ function getBasicFragment() {
             }    
         }
         shadow /= 9.0;
-
+ 
         return shadow;        
+    }
+
+    float PLCalculateShadow()
+    {
+       
+        vec3 fragToLight = fFragPos - pointLightPos;
+        float currentDepth = length(fragToLight);
+        float bias = 0.08; 
+
+        float shadow = 0.0;
+        float texelSize = 1.0 / 1024.0;
+        for(int x = -1; x <= 1; ++x)
+        {
+            for(int y = -1; y <= 1; ++y)
+            {
+                float pcfDepth = texture(pShadowMap, normalize(fragToLight)).r;
+                pcfDepth *= 50.0;
+
+                shadow += currentDepth -  bias > pcfDepth ? pointLightIntensity / 1.6 : 0.0;        
+            }    
+        }
+        shadow /= 9.0;    
+        return shadow;       
     }
 
     void main() 
@@ -126,12 +151,22 @@ function getBasicFragment() {
 
         vec3 text = texture(uSampler_1, fUv).rgb;
 
-        float shadow = 1.0 - CalculateShadow();
+        vec3 fragToLight = fFragPos - pointLightPos;
+        float dirD = dot(normalize(-fDirLight), normalize(fNormal));
+        float dirP = dot(normalize(-fragToLight), normalize(fNormal));
+
+        float shadow = 1.0;
+        float shadowPL = 1.0;
+        shadow = 1.0 - CalculateShadow();
+
+        //Remove point light shadows for now, they look bad when self shadowing
+        //if(dirP > 0.0)
+           // shadowPL = 1.0 - PLCalculateShadow();
 
         vec3 ref = reflect(-normalize(viewDir), normalize(fNormal));
 
 
-        vec3 finalColor = shadow * text * allLights ;
+        vec3 finalColor = shadowPL * shadow * text * allLights ;
 
         myOutputColor = vec4(finalColor,1);
     }

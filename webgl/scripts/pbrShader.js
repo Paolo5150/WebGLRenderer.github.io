@@ -145,17 +145,22 @@ function getPBRShaderFragment() {
     {
        
         vec3 fragToLight = fFragPos - fLightPosition;
-
-        float closestDepth = texture(pShadowMap, normalize(fragToLight)).r;
-
-        closestDepth *= 50.0;
-
         float currentDepth = length(fragToLight);
-
         float bias = 0.001; 
 
-        float shadow = currentDepth -  bias > closestDepth ? pointLightIntensity / 1.6 : 0.0;
-    
+        float shadow = 0.0;
+        float texelSize = 1.0 / 1024.0;
+        for(int x = -1; x <= 1; ++x)
+        {
+            for(int y = -1; y <= 1; ++y)
+            {
+                float pcfDepth = texture(pShadowMap, normalize(fragToLight)).r;
+                pcfDepth *= 50.0;
+
+                shadow += currentDepth -  bias > pcfDepth ? pointLightIntensity / 1.6 : 0.0;        
+            }    
+        }
+        shadow /= 9.0;    
         return shadow;       
     }
 
@@ -194,8 +199,21 @@ function getPBRShaderFragment() {
         col = col / (col + vec3(1.0));
         col = pow(col, vec3(1.0/2.2));
 
-        float shadow = 1.0 - CalculateShadow();
-        float shadowPL = 1.0 - PLCalculateShadow();
+        vec3 fragToLight = fFragPos - fLightPosition;
+        float dirD = dot(normalize(-fDirLight), normalize(fNormal));
+        float dirP = dot(normalize(-fragToLight), normalize(fNormal));
+
+        float shadow = 1.0;
+        float shadowPL = 1.0;
+        if(dirD > 0.0)
+        {
+            shadow = 1.0 - CalculateShadow();
+        }
+        if(dirP > 0.0)
+        {
+            shadowPL = 1.0 - PLCalculateShadow();
+
+        }
 
         vec3 finalColor = (shadowPL * shadow) * col;
 
