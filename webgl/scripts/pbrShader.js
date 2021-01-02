@@ -120,6 +120,7 @@ function getPBRShaderFragment() {
     uniform float metallicModifier;
     uniform float roughnessModifier;
 
+    uniform float doShadow;
 
     uniform sampler2D  albedoMap;
     uniform sampler2D metallicMap;
@@ -252,11 +253,16 @@ function getPBRShaderFragment() {
         col = col / (col + vec3(1.0));
         col = pow(col, vec3(1.0/2.2));
 
+        float shadow = 1.0;
+        float shadowPL = 1.0;
+        if(doShadow == 1.0)
+        {
+            shadow = 1.0 - CalculateShadow();
+            shadowPL = 1.0 - PLCalculateShadow();
+        }
+        
 
-        float shadow = 1.0 - CalculateShadow();
-        float shadowPL = 1.0 - PLCalculateShadow();
-
-        vec3 finalColor =  shadow * shadowPL * col;
+        vec3 finalColor = shadow * shadowPL * col;
 
         myOutputColor = vec4(finalColor,1);
     }

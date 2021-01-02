@@ -48,7 +48,7 @@ class Texture
     }
     static Create(widh, height,internalFormat = gl.RGBA, format = gl.RGBA, type = gl.UNSIGNED_BYTE, 
         minFilter = gl.NEAREST, magFilter = gl.NEAREST, wrapMode = gl.CLAMP_TO_EDGE, generateMipMaps = false) {
-            
+
         let t = new Texture()
 
         gl.bindTexture(gl.TEXTURE_2D, t.textID);        
@@ -70,14 +70,21 @@ class Texture
             gl.bindTexture(gl.TEXTURE_2D, null);
         return t
     }    
+    
 
+
+    //HDR format needs some extra work to load an image
      //onLoad, callback with the texture obj
-    static FromURLhdr(url, onLoad) {
+    static FromURL_HDR(url, onLoad) {
 
+        var d = {
+            imageSrc: url
+        }
         $.ajax({
-            url: "https://pf-portfolio-backend.herokuapp.com/loadImage",
+            url: "http://localhost:3000/loadImage",
             type: 'post',
             dataType: '',
+            data: JSON.stringify(d),
             cors: true ,
             contentType:'application/json',
             secure: true,
@@ -86,6 +93,7 @@ class Texture
             },
             success: function (body){
                 
+                console.log("RECEIVED HDR, starting to parse")
                 let result = []
                 for (var i = 0; i < body.length; i+=2)
                     result.push('0x'+body[i]+''+body[i+1])

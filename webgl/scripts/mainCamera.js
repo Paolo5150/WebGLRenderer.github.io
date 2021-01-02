@@ -2,15 +2,16 @@ class MainCamera
 {
     constructor() {
         this.camObj = Camera.perspective(60,16.0/9.0,0.1,50)
-        this.camObj.position = [0 , 8 , 5]
+        this.camObj.position = [0 , 4 , 5]
         this.camObj.updateView()
         this.cameraAngle = Math.PI / 2.0
-        this.cameraDistance = 10
+        this.cameraDistance = 15
+        this.camObj.target = [0,3,0]
 
     }
 
     update(delta) {
-        if(leftButtonDown)
+        if(!leftButtonDown)
         {
             this.cameraDistance -= mousePositionDelta[1] * delta * 10
         }

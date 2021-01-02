@@ -13,7 +13,12 @@ var cube = null
 var skybox = null
 var equirectCube = null
 
-
+var engine = new BABYLON.Engine(canvas, true, {preserveDrawingBuffer: true, stencil: true});
+var scene = new BABYLON.Scene(engine);
+BABYLON.OBJFileLoader.COMPUTE_NORMALS  = true;
+BABYLON.OBJFileLoader.OPTIMIZE_NORMALS = true;
+BABYLON.OBJFileLoader.SKIP_MATERIALS = true;
+BABYLON.OBJFileLoader.INVERT_TEXTURE_Y = false;
 
 let cubeMapTest = Cubemap.FromURLs(
   [
@@ -71,25 +76,51 @@ pbrTools.createBDRFTexture(renderer,camera, 0)
 let textureViewer = new TextureViewer([-0.8,-0.3,0.0],[0.3,0.7,1.0], pbrTools.bdrfFBO.attachments['color0'], false)
 //let cubemapTextureViewer = new CubemapTextureViewer([-0.8,-0.3,0.0],[0.3,0.7,1.0], pbrTools.frameBuffer.attachments['color0'], "left", false)
 
-let pbrMat = getPBRMaterial()
-pbrMat.addTexture("shadowMap", directionalLight.shadowFrameBuffer.attachments['depth'])
-pbrMat.addVec3Uniform("camPos", ()=>{return camera.camObj.position})
-pbrMat.addMat4Uniform("lightSpace", ()=>{return directionalLight.ligthtSpaceMatrix})
-pbrMat.addCubeMap("pShadowMap", pointlLight.shadowFrameBuffer.attachments['depth'])
-pbrMat.addCubeMap("irradianceMap", pbrTools.convFBO.attachments['color0'])
-pbrMat.addCubeMap("prefilteredMap", pbrTools.preFilteredFBO.attachments['color0'])
-pbrMat.addTexture("bdrf", pbrTools.bdrfFBO.attachments['color0'])
+let floorMat = getPBRMaterial()
+floorMat.addTexture("shadowMap", directionalLight.shadowFrameBuffer.attachments['depth'])
+floorMat.addVec3Uniform("camPos", ()=>{return camera.camObj.position})
+floorMat.addMat4Uniform("lightSpace", ()=>{return directionalLight.ligthtSpaceMatrix})
+floorMat.addCubeMap("pShadowMap", pointlLight.shadowFrameBuffer.attachments['depth'])
+floorMat.addCubeMap("irradianceMap", pbrTools.convFBO.attachments['color0'])
+floorMat.addCubeMap("prefilteredMap", pbrTools.preFilteredFBO.attachments['color0'])
+floorMat.addTexture("bdrf", pbrTools.bdrfFBO.attachments['color0'])
+floorMat.addTexture("albedoMap",Texture.FromURL('webgl/pbr/MahogFloor/albedo.png'))
+floorMat.addTexture("metallicMap",Texture.FromURL('webgl/pbr/MahogFloor/metallic.psd'))
+floorMat.addTexture("normalMap",Texture.FromURL('webgl/pbr/MahogFloor/normal.png'))
+floorMat.addTexture("aoMap",Texture.FromURL('webgl/pbr/MahogFloor/ao.png'))
+floorMat.addTexture("roughnessMap",Texture.FromURL('webgl/pbr/black.png'))
+floorMat.addFloatUniform("metallicModifier", ()=>{return 0.0})
+floorMat.addFloatUniform("roughnessModifier", ()=>{return 0.4})
+floorMat.addFloatUniform("doShadow", ()=>{return 1.0})
 
 
-/*
-Texture.FromURLhdr('webgl/skyboxes/HDR/Alexs_Apt_2k.hdr', (loadedTexture)=>{
+let sphereMat = getPBRMaterial()
+sphereMat.addTexture("shadowMap", directionalLight.shadowFrameBuffer.attachments['depth'])
+sphereMat.addVec3Uniform("camPos", ()=>{return camera.camObj.position})
+sphereMat.addMat4Uniform("lightSpace", ()=>{return directionalLight.ligthtSpaceMatrix})
+sphereMat.addCubeMap("pShadowMap", pointlLight.shadowFrameBuffer.attachments['depth'])
+sphereMat.addCubeMap("irradianceMap", pbrTools.convFBO.attachments['color0'])
+sphereMat.addCubeMap("prefilteredMap", pbrTools.preFilteredFBO.attachments['color0'])
+sphereMat.addTexture("bdrf", pbrTools.bdrfFBO.attachments['color0'])
+sphereMat.addTexture("albedoMap",Texture.FromURL('webgl/pbr/Iron/albedo.png'))
+sphereMat.addTexture("metallicMap",Texture.FromURL('webgl/pbr/Iron/metallic.png'))
+sphereMat.addTexture("normalMap",Texture.FromURL('webgl/pbr/Iron/normal.png'))
+sphereMat.addTexture("aoMap",Texture.FromURL('webgl/pbr/Iron/ao.png'))
+sphereMat.addTexture("roughnessMap",Texture.FromURL('webgl/pbr/Iron/roughness.png'))
+sphereMat.addFloatUniform("metallicModifier", ()=>{return 0.0})
+sphereMat.addFloatUniform("roughnessModifier", ()=>{return 0.0})
+sphereMat.addFloatUniform("doShadow", ()=>{return 0.0})
+
+
+
+Texture.FromURL_HDR('https://twinkllinjeweles.000webhostapp.com/Alexs_Apt_2k.hdr', (loadedTexture)=>{
 //  textureViewer.setTexture(loadedTexture)
 
   pbrTools.renderToCubemap(renderer, 0, equirectCube, loadedTexture)
   skybox = new Skybox(pbrTools.frameBuffer.attachments['color0'], cube) //Pass the cube mesh renderer, the amterial will be overriden
 
   
-})*/
+})
 
 let woodMat = getWoodMaterial()
 woodMat.addVec3Uniform("camPos", ()=>{return camera.camObj.position})
@@ -100,16 +131,8 @@ woodMat.addCubeMap("pShadowMap", pointlLight.shadowFrameBuffer.attachments['dept
 let untexturedMat = getUntexturedMaterial([1,1,1])
 untexturedMat.addMat4Uniform("lightSpace", ()=>{return directionalLight.ligthtSpaceMatrix })
 
-
-
-let floorMat = geFloorMaterial()
-floorMat.addVec3Uniform("camPos", ()=>{return camera.camObj.position})
-floorMat.addTexture("shadowMap", directionalLight.shadowFrameBuffer.attachments['depth'])
-floorMat.addMat4Uniform("lightSpace", ()=>{return directionalLight.ligthtSpaceMatrix })
-
-
 let screenQuad = new MeshRenderer(getQuadMesh(), hdrPostProcessMaterial)
-let floor = new MeshRenderer(getQuadMesh(), pbrMat)
+let floor = new MeshRenderer(getQuadMesh(), floorMat)
 floor.rotation[0] = -90
 floor.position = [0,0,-1]
 floor.scale = [25,25,1]
@@ -118,41 +141,35 @@ renderer.addMeshRenderer(floor)
 loadOBJ("webgl/models/cubic.obj").then((value) => {
     if(value != undefined)
     {
-        let meshR = new MeshRenderer(value,untexturedMat)
+        let meshR = new MeshRenderer(value[0],untexturedMat)
         meshR.position = [-2,4,2]
         meshR.rotation = [0,0,0]
         meshR.scale = [0.4,0.4,0.4]
 
-        let m2 = new MeshRenderer(value,woodMat)
-        m2.position = [2,2,-2]
-        m2.rotation = [0,0,0]
-
         renderer.addMeshRenderer(meshR)
 
-        renderer.addMeshRenderer(m2)
-        directionalLight.shadowCasters.push(m2)
-        pointlLight.shadowCasters.push(m2)
         cube = meshR
 
-        equirectCube = new MeshRenderer(value,null) // Material set in PBRTools
+        equirectCube = new MeshRenderer(value[0],null) // Material set in PBRTools
 
     }
 })
 
 
-loadOBJ("webgl/models/Deer.obj").then((value) => {
+loadOBJ("webgl/models/geosphere.obj").then((value) => {
     if(value != undefined)
     {
-        let meshR = new MeshRenderer(value,woodMat)
-        meshR.position = [0,0,0]
-        meshR.scale = [0.01,0.01,0.01]
-        meshR.rotation = [0,0,0]
-
+      for(var m = 0; m < value.length; m++)
+      {
+        let meshR = new MeshRenderer(value[m],sphereMat)
+        meshR.position = [0,2,0]
+        meshR.scale = [0.1,0.1,0.1]
         renderer.addMeshRenderer(meshR)
         directionalLight.shadowCasters.push(meshR)
         pointlLight.shadowCasters.push(meshR)
-
-        deer = meshR
+        deer = meshR;
+      }
+        
     }
 })
 
@@ -183,7 +200,8 @@ var render = function(time) {
     //Render scene to frame buffer
     regularSceneFrameBuffer.bind()
 
-    renderer.clearAll(0,0,0,1)      
+    renderer.clearAll(0,0,0,1)   
+    gl.disable(gl.CULL_FACE)
     renderer.render(camera.camObj,time)
     if(skybox != null)
         skybox.render(camera.camObj, time)
@@ -198,7 +216,7 @@ var render = function(time) {
     renderer.renderMeshRendererForceMaterial(camera.camObj,time,screenQuad, hdrPostProcessMaterial)
 
     //Texture viewer
-    renderer.renderMeshRenderer(camera.camObj,time,textureViewer.quad)
+    //renderer.renderMeshRenderer(camera.camObj,time,textureViewer.quad)
 
     window.requestAnimationFrame(render)
 }

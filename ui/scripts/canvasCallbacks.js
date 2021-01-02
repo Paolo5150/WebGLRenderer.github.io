@@ -16,7 +16,6 @@ $( document ).ready(function() {
     });
       
     $("#mycanvas").mousedown(function(e){
-        e.preventDefault()
         switch (e.which) {
             case 1:
                 clicking = true
@@ -41,7 +40,8 @@ $( document ).ready(function() {
 
     
     $( document ).on( "keydown", function( e ){
-
+        e.preventDefault()
+  
         if(e.key === 'a')
             mousePositionDelta[0] = 1
         else if(e.key === 'd')

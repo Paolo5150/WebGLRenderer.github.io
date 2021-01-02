@@ -7,6 +7,36 @@ class Cubemap
         
     }
 
+    /*
+        urlArray format:
+         [
+      {
+          target: gl.TEXTURE_CUBE_MAP_POSITIVE_X,
+          url: 'webgl/skyboxes/ClearSky/right.jpg',
+        },
+        {
+          target: gl.TEXTURE_CUBE_MAP_NEGATIVE_X,
+          url: 'webgl/skyboxes/ClearSky/left.jpg',
+        },
+        {
+          target: gl.TEXTURE_CUBE_MAP_POSITIVE_Y,
+          url: 'webgl/skyboxes/ClearSky/top.jpg',
+        },
+        {
+          target: gl.TEXTURE_CUBE_MAP_NEGATIVE_Y,
+          url: 'webgl/skyboxes/ClearSky/bottom.jpg',
+        },
+        {
+          target: gl.TEXTURE_CUBE_MAP_POSITIVE_Z,
+          url: 'webgl/skyboxes/ClearSky/back.jpg',
+        },
+        {
+          target: gl.TEXTURE_CUBE_MAP_NEGATIVE_Z,
+          url: 'webgl/skyboxes/ClearSky/front.jpg',
+        },
+  ]
+    */
+
     static FromURLs(urlArray)
     {
         let t = new Cubemap()
@@ -37,9 +67,7 @@ class Cubemap
 
         return t
 
-    }
-
-   
+    }   
     
 
     static CreateDepthFloat(widh, height) {
