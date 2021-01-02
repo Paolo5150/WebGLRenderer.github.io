@@ -212,8 +212,21 @@ class Texture
     //onLoad, callback with the texture obj
     static FromURLhdr(url, onLoad) {
 
-        //Need to get from server
-        $.post("http://localhost:3000/loadImage",  function(result){
+        $.ajax({
+            url: "https://pf-portfolio-backend.herokuapp.com/loadImage",
+            type: 'post',
+            dataType: '',
+            cors: true ,
+            contentType:'application/json',
+            secure: true,
+            headers: {
+              'Access-Control-Allow-Origin': '*',
+            },
+            success: function (body){
+                let result = []
+                for (var i = 0; i < body.length; i+=2)
+                  result.push('0x'+body[i]+''+body[i+1])
+
             var hdrInfo = HDRTools.RGBE_ReadHeader(result)
             var fArray = HDRTools.RGBE_ReadPixels(result, hdrInfo)
             console.log(hdrInfo)
@@ -236,9 +249,10 @@ class Texture
             gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE);
             gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
             onLoad(t)
+            }
+        })
 
-          })
-    }
+         }
 
     bind() {
 

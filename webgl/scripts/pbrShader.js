@@ -194,7 +194,7 @@ function getPBRShaderFragment() {
                 float pcfDepth = texture(pShadowMap, normalize(fragToLight)).r;
                 pcfDepth *= 50.0;
 
-                shadow += currentDepth -  bias > pcfDepth ? pointLightIntensity / 2.5 : 0.0;        
+                shadow += currentDepth -  bias > pcfDepth ? pointLightIntensity / 12.0 : 0.0;        
             }    
         }
         shadow /= 9.0;    
