@@ -11,7 +11,7 @@ class DirectionalLight
         this.shadowCam.updateView()
 
         this.shadowFrameBuffer = new Framebuffer(2048,2048)
-        this.shadowFrameBuffer.addDepthAttachmentFloat()
+        this.shadowFrameBuffer.addTextureDepthAttachment()
 
         this.materialForShadowmap = getDepthRenderMaterial()
 

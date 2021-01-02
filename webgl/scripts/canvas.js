@@ -14,6 +14,7 @@ var skybox = null
 var equirectCube = null
 
 
+
 let cubeMapTest = Cubemap.FromURLs(
   [
       {
@@ -43,15 +44,17 @@ let cubeMapTest = Cubemap.FromURLs(
   ]
 )
 
-let directionalLight = new DirectionalLight()
-let pointlLight = new PointLight()
+
 
 //Post process framebuffers
 var regularSceneFrameBuffer = new Framebuffer(canvas.width, canvas.height)
-regularSceneFrameBuffer.addColorAttachmentFloatFormat( 1)
-regularSceneFrameBuffer.addDepthAttachment()
+regularSceneFrameBuffer.addTextureColorAttachment( 1, gl.RGBA16F, gl.RGBA, gl.FLOAT, gl.LINEAR, gl.LINEAR, gl.REPEAT)
+regularSceneFrameBuffer.addTextureDepthAttachment()
 
-var bloomEffect = new BloomEffect(canvas.width, canvas.height)
+let directionalLight = new DirectionalLight()
+let pointlLight = new PointLight()
+
+//var bloomEffect = new BloomEffect(canvas.width, canvas.height)
 
 //Post processing materials and textures
 let hdrPostProcessMaterial = getPostProcessHDRMaterial()
@@ -78,7 +81,7 @@ pbrMat.addCubeMap("prefilteredMap", pbrTools.preFilteredFBO.attachments['color0'
 pbrMat.addTexture("bdrf", pbrTools.bdrfFBO.attachments['color0'])
 
 
-
+/*
 Texture.FromURLhdr('webgl/skyboxes/HDR/Alexs_Apt_2k.hdr', (loadedTexture)=>{
 //  textureViewer.setTexture(loadedTexture)
 
@@ -86,7 +89,7 @@ Texture.FromURLhdr('webgl/skyboxes/HDR/Alexs_Apt_2k.hdr', (loadedTexture)=>{
   skybox = new Skybox(pbrTools.frameBuffer.attachments['color0'], cube) //Pass the cube mesh renderer, the amterial will be overriden
 
   
-})
+})*/
 
 let woodMat = getWoodMaterial()
 woodMat.addVec3Uniform("camPos", ()=>{return camera.camObj.position})
@@ -195,7 +198,7 @@ var render = function(time) {
     renderer.renderMeshRendererForceMaterial(camera.camObj,time,screenQuad, hdrPostProcessMaterial)
 
     //Texture viewer
-    //renderer.renderMeshRenderer(camera.camObj,time,textureViewer.quad)
+    renderer.renderMeshRenderer(camera.camObj,time,textureViewer.quad)
 
     window.requestAnimationFrame(render)
 }

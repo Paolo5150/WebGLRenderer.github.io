@@ -6,17 +6,17 @@ class BloomEffect
         this.height = height
 
         this.bloomSceneFrameBuffer = new Framebuffer(width, height)
-        this.bloomSceneFrameBuffer.addColorAttachmentFloatFormat( 1)
+        this.bloomSceneFrameBuffer.addTextureColorAttachment( 1, Texture.Create(gl.RGBA16F, gl.RGBA, gl.FLOAT, gl.LINEAR, gl.LINEAR, gl.REPEAT))
         this.bloomSceneFrameBuffer.addDepthAttachment()
 
         this.brightnessFrameBuf = new Framebuffer(width, height)
-        this.brightnessFrameBuf.addColorAttachmentFloatFormat( 1)
+        this.brightnessFrameBuf.addTextureColorAttachment( 1, Texture.Create(gl.RGBA16F, gl.RGBA, gl.FLOAT, gl.LINEAR, gl.LINEAR, gl.REPEAT))
 
         this.blurFrameBuffer = []
         this.blurFrameBuffer[0] = new Framebuffer(width, height)
-        this.blurFrameBuffer[0].addColorAttachmentFloatFormat( 1)
+        this.blurFrameBuffer[0].addTextureColorAttachment( 1, Texture.Create(gl.RGBA16F, gl.RGBA, gl.FLOAT, gl.LINEAR, gl.LINEAR, gl.REPEAT))
         this.blurFrameBuffer[1] = new Framebuffer(width, height)
-        this.blurFrameBuffer[1].addColorAttachmentFloatFormat( 1)
+        this.blurFrameBuffer[1].addTextureColorAttachment( 1, Texture.Create(gl.RGBA16F, gl.RGBA, gl.FLOAT, gl.LINEAR, gl.LINEAR, gl.REPEAT))
 
         this.brightnessExtractProcessMaterial = getPostProcessBrightnessExtractMaterial()
         this.brightnessExtractProcessMaterial.addTexture("uSampler_1",this.bloomSceneFrameBuffer.attachments['color0'])

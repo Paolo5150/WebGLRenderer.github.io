@@ -7,63 +7,35 @@ class Framebuffer {
         this.height = height
     }
 
-    addColorAttachment( count) {
+
+    addTextureColorAttachment(count, internalFormat, format, type, minFilter, magFilter, wrapMode)
+    {
       gl.bindFramebuffer(gl.FRAMEBUFFER, this.frameBuffer)
 
       for(var i=0; i< count; i++) {
 
         var id = "color" + i
-        var t = Texture.CreateEmpty(this.width, this.height)
+        var t = Texture.Create(this.width, this.height, internalFormat, format, type, minFilter, magFilter, wrapMode)
         t.bind()
         gl.framebufferTexture2D(gl.FRAMEBUFFER, gl.COLOR_ATTACHMENT0 + i, gl.TEXTURE_2D, t.textID, 0);
     
         this.attachments[id] = t
-    }
+      }
 
       gl.bindFramebuffer(gl.FRAMEBUFFER, null)
 
     }
 
-    addColorAttachmentFloatRGFormat( count) {
-      gl.bindFramebuffer(gl.FRAMEBUFFER, this.frameBuffer)
-
-      for(var i=0; i< count; i++) {
-
-        var id = "color" + i
-        var t = Texture.CreateEmptyFloatRGFormat(this.width, this.height)
-        t.bind()
-        gl.framebufferTexture2D(gl.FRAMEBUFFER, gl.COLOR_ATTACHMENT0 + i, gl.TEXTURE_2D, t.textID, 0);
-    
-        this.attachments[id] = t
-    }
-
-      gl.bindFramebuffer(gl.FRAMEBUFFER, null)
-
-    }
-
-
-    addColorAttachmentFloatFormat( count) {
-      gl.bindFramebuffer(gl.FRAMEBUFFER, this.frameBuffer)
-
-      for(var i=0; i< count; i++) {
-
-        var id = "color" + i
-        var t = Texture.CreateEmptyFloatFormat(this.width, this.height)
-        t.bind()
-        gl.framebufferTexture2D(gl.FRAMEBUFFER, gl.COLOR_ATTACHMENT0 + i, gl.TEXTURE_2D, t.textID, 0);
-    
-        this.attachments[id] = t
-    }
-
-      gl.bindFramebuffer(gl.FRAMEBUFFER, null)
-
-    }
-
-    addDepthAttachmentFloat() {
+    addTextureDepthAttachment(type = "float")
+    {
       gl.bindFramebuffer(gl.FRAMEBUFFER, this.frameBuffer)
 
       var id = "depth"
-      this.attachments[id] = Texture.CreateDepthFloat(this.width,this.height)
+      if(type === "float")
+        this.attachments[id] = Texture.Create(this.width,this.height, gl.DEPTH_COMPONENT32F, gl.DEPTH_COMPONENT, gl.FLOAT)
+        else
+        this.attachments[id] = Texture.Create(this.width,this.height, gl.DEPTH_COMPONENT24, gl.DEPTH_COMPONENT, gl.UNSIGNED_INT)
+
       gl.framebufferTexture2D(gl.FRAMEBUFFER, gl.DEPTH_ATTACHMENT, gl.TEXTURE_2D, this.attachments[id].textID, 0);
       gl.bindFramebuffer(gl.FRAMEBUFFER, null)
 
@@ -114,16 +86,7 @@ class Framebuffer {
 
     }
 
-    addDepthAttachment() {
 
-      var id = "depth"
-      this.attachments[id] = Texture.CreateDepth(this.width, this.height)
-      gl.bindFramebuffer(gl.FRAMEBUFFER, this.frameBuffer)
-
-      gl.framebufferTexture2D(gl.FRAMEBUFFER, gl.DEPTH_ATTACHMENT, gl.TEXTURE_2D, this.attachments[id].textID, 0);
-      gl.bindFramebuffer(gl.FRAMEBUFFER, null)
-
-    }
 
     bind() {
       gl.bindFramebuffer(gl.FRAMEBUFFER, this.frameBuffer)

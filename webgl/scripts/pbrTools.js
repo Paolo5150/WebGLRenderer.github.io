@@ -35,7 +35,7 @@ class PBRTools
         this.preFilteredFBO.addCubeColorAttachmentFloat(true)
 
         this.bdrfFBO = new Framebuffer(512,512)
-        this.bdrfFBO.addColorAttachmentFloatRGFormat(1)
+        this.bdrfFBO.addTextureColorAttachment(1, gl.RGBA16F, gl.RGBA, gl.FLOAT, gl.LINEAR, gl.LINEAR, gl.REPEAT)
 
         var cubemapShad = createShaderProgram(getEquirectVertex(), getEquirectFragment())
         this.equirectMat = new Material(cubemapShad)
