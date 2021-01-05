@@ -1,5 +1,6 @@
 var mousePosition = [0,0]
 var mousePositionDelta = [0,0]
+var upDown = 0
 var leftButtonDown = false
 var rightButtonDown = false
 var midButtonDown = false
@@ -50,11 +51,17 @@ $( document ).ready(function() {
             mousePositionDelta[1] = 1
         else if(e.key === 's')
             mousePositionDelta[1] = -1
+
+        if(e.key === 'q')
+            upDown = 1
+        else if(e.key === 'z')
+            upDown = -1
     })
 
     $( document ).on( "keyup", function( e ){
 
         mousePositionDelta = [0,0]
+        upDown = 0
     })
 
 })

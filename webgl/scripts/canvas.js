@@ -20,34 +20,6 @@ BABYLON.OBJFileLoader.OPTIMIZE_NORMALS = true;
 BABYLON.OBJFileLoader.SKIP_MATERIALS = true;
 BABYLON.OBJFileLoader.INVERT_TEXTURE_Y = false;
 
-let cubeMapTest = Cubemap.FromURLs(
-  [
-      {
-          target: gl.TEXTURE_CUBE_MAP_POSITIVE_X,
-          url: 'webgl/skyboxes/ClearSky/right.jpg',
-        },
-        {
-          target: gl.TEXTURE_CUBE_MAP_NEGATIVE_X,
-          url: 'webgl/skyboxes/ClearSky/left.jpg',
-        },
-        {
-          target: gl.TEXTURE_CUBE_MAP_POSITIVE_Y,
-          url: 'webgl/skyboxes/ClearSky/top.jpg',
-        },
-        {
-          target: gl.TEXTURE_CUBE_MAP_NEGATIVE_Y,
-          url: 'webgl/skyboxes/ClearSky/bottom.jpg',
-        },
-        {
-          target: gl.TEXTURE_CUBE_MAP_POSITIVE_Z,
-          url: 'webgl/skyboxes/ClearSky/back.jpg',
-        },
-        {
-          target: gl.TEXTURE_CUBE_MAP_NEGATIVE_Z,
-          url: 'webgl/skyboxes/ClearSky/front.jpg',
-        },
-  ]
-)
 
 
 
@@ -59,21 +31,21 @@ regularSceneFrameBuffer.addTextureDepthAttachment()
 let directionalLight = new DirectionalLight()
 let pointlLight = new PointLight()
 
-//var bloomEffect = new BloomEffect(canvas.width, canvas.height)
+var bloomEffect = new BloomEffect(canvas.width, canvas.height)
 
 //Post processing materials and textures
 let hdrPostProcessMaterial = getPostProcessHDRMaterial()
 hdrPostProcessMaterial.addTexture("sceneTexture",regularSceneFrameBuffer.attachments['color0'])
-//hdrPostProcessMaterial.addTexture("bloomBlur", bloomEffect.blurFrameBuffer[1].attachments['color0'])
+hdrPostProcessMaterial.addTexture("bloomTexture", bloomEffect.blurFrameBuffer[1].attachments['color0'])
+let blackTexture = Texture.FromURL('webgl/pbr/black.png')
 
 Framebuffer.unbind()
 
 $( document ).ready(function() {
 
-
 pbrTools.createBDRFTexture(renderer,camera, 0)
 
-let textureViewer = new TextureViewer([-0.8,-0.3,0.0],[0.3,0.7,1.0], pbrTools.bdrfFBO.attachments['color0'], false)
+let textureViewer = new TextureViewer([-0.8,-0.3,0.0],[0.3,0.7,1.0], bloomEffect.brightnessFrameBuf.attachments['color0'], false)
 //let cubemapTextureViewer = new CubemapTextureViewer([-0.8,-0.3,0.0],[0.3,0.7,1.0], pbrTools.frameBuffer.attachments['color0'], "left", false)
 
 let floorMat = getPBRMaterial()
@@ -90,7 +62,7 @@ floorMat.addTexture("normalMap",Texture.FromURL('webgl/pbr/MahogFloor/normal.png
 floorMat.addTexture("aoMap",Texture.FromURL('webgl/pbr/MahogFloor/ao.png'))
 floorMat.addTexture("roughnessMap",Texture.FromURL('webgl/pbr/black.png'))
 floorMat.addFloatUniform("metallicModifier", ()=>{return 0.0})
-floorMat.addFloatUniform("roughnessModifier", ()=>{return 0.4})
+floorMat.addFloatUniform("roughnessModifier", ()=>{return 0.3})
 floorMat.addFloatUniform("doShadow", ()=>{return 1.0})
 
 
@@ -102,7 +74,7 @@ sphereMat.addCubeMap("pShadowMap", pointlLight.shadowFrameBuffer.attachments['de
 sphereMat.addCubeMap("irradianceMap", pbrTools.convFBO.attachments['color0'])
 sphereMat.addCubeMap("prefilteredMap", pbrTools.preFilteredFBO.attachments['color0'])
 sphereMat.addTexture("bdrf", pbrTools.bdrfFBO.attachments['color0'])
-sphereMat.addTexture("albedoMap",Texture.FromURL('webgl/pbr/Iron/albedo.png'))
+sphereMat.addTexture("albedoMap",Texture.FromURL('webgl/pbr/Iron/albedo.png', gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE))
 sphereMat.addTexture("metallicMap",Texture.FromURL('webgl/pbr/Iron/metallic.png'))
 sphereMat.addTexture("normalMap",Texture.FromURL('webgl/pbr/Iron/normal.png'))
 sphereMat.addTexture("aoMap",Texture.FromURL('webgl/pbr/Iron/ao.png'))
@@ -110,6 +82,23 @@ sphereMat.addTexture("roughnessMap",Texture.FromURL('webgl/pbr/Iron/roughness.pn
 sphereMat.addFloatUniform("metallicModifier", ()=>{return 0.0})
 sphereMat.addFloatUniform("roughnessModifier", ()=>{return 0.0})
 sphereMat.addFloatUniform("doShadow", ()=>{return 0.0})
+
+let deerMat = getPBRMaterial()
+deerMat.addTexture("shadowMap", directionalLight.shadowFrameBuffer.attachments['depth'])
+deerMat.addVec3Uniform("camPos", ()=>{return camera.camObj.position})
+deerMat.addMat4Uniform("lightSpace", ()=>{return directionalLight.ligthtSpaceMatrix})
+deerMat.addCubeMap("pShadowMap", pointlLight.shadowFrameBuffer.attachments['depth'])
+deerMat.addCubeMap("irradianceMap", pbrTools.convFBO.attachments['color0'])
+deerMat.addCubeMap("prefilteredMap", pbrTools.preFilteredFBO.attachments['color0'])
+deerMat.addTexture("bdrf", pbrTools.bdrfFBO.attachments['color0'])
+deerMat.addTexture("albedoMap",Texture.FromURL('webgl/pbr/gold/albedo.png', gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE))
+deerMat.addTexture("metallicMap",Texture.FromURL('webgl/pbr/gold/metallic.png'))
+deerMat.addTexture("normalMap",Texture.FromURL('webgl/pbr/gold/normal.png'))
+deerMat.addTexture("aoMap",Texture.FromURL('webgl/pbr/gold/ao.png'))
+deerMat.addTexture("roughnessMap",Texture.FromURL('webgl/pbr/gold/roughness.png'))
+deerMat.addFloatUniform("metallicModifier", ()=>{return 0.0})
+deerMat.addFloatUniform("roughnessModifier", ()=>{return 0.0})
+deerMat.addFloatUniform("doShadow", ()=>{return 1.0})
 
 
 
@@ -162,7 +151,7 @@ loadOBJ("webgl/models/geosphere.obj").then((value) => {
       for(var m = 0; m < value.length; m++)
       {
         let meshR = new MeshRenderer(value[m],sphereMat)
-        meshR.position = [0,2,0]
+        meshR.position = [-2,2,0]
         meshR.scale = [0.1,0.1,0.1]
         renderer.addMeshRenderer(meshR)
         directionalLight.shadowCasters.push(meshR)
@@ -171,6 +160,22 @@ loadOBJ("webgl/models/geosphere.obj").then((value) => {
       }
         
     }
+})
+
+loadOBJ("webgl/models/Deer.obj").then((value) => {
+  if(value != undefined)
+  {
+    for(var m = 0; m < value.length; m++)
+    {
+      let meshR = new MeshRenderer(value[m],deerMat)
+      meshR.position = [2,0,0]
+      meshR.scale = [0.02,0.02,0.02]
+      renderer.addMeshRenderer(meshR)
+      directionalLight.shadowCasters.push(meshR)
+      pointlLight.shadowCasters.push(meshR)
+    }
+      
+  }
 })
 
 var prev = 0;
@@ -206,7 +211,17 @@ var render = function(time) {
     if(skybox != null)
         skybox.render(camera.camObj, time)
   
-    //bloomEffect.update(renderer, camera.camObj, time,cube)
+
+    if(uiManager.useBloom)
+    {
+      hdrPostProcessMaterial.addTexture("bloomTexture", bloomEffect.blurFrameBuffer[1].attachments['color0'])
+      bloomEffect.update(renderer, camera, time,cube)
+    }
+    else
+    {
+      hdrPostProcessMaterial.addTexture("bloomTexture", blackTexture)
+
+    }
    
     //Quad to screen
     Framebuffer.unbind()
@@ -216,7 +231,7 @@ var render = function(time) {
     renderer.renderMeshRendererForceMaterial(camera.camObj,time,screenQuad, hdrPostProcessMaterial)
 
     //Texture viewer
-    //renderer.renderMeshRenderer(camera.camObj,time,textureViewer.quad)
+    renderer.renderMeshRenderer(camera.camObj,time,textureViewer.quad)
 
     window.requestAnimationFrame(render)
 }

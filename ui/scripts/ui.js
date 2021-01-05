@@ -17,22 +17,23 @@ class UIManager {
         this.lightPos = [-3.7,5.1,-1.8]
         this.pLightIntensity = 0.8
 
-        this.gamma = 0.8
-        this.exposure = 2.0
+        this.gamma = 0.6
+        this.exposure = 1.4
+        this.useBloom = false
     }
 
     initialize() {
 
-         $("#dirLightX").val(uiManager.lightDir[0])
-         $("#dirLightY").val(uiManager.lightDir[1])
-         $("#dirLightZ").val(uiManager.lightDir[2])
+         $("#dirLightX").val(this.lightDir[0])
+         $("#dirLightY").val(this.lightDir[1])
+         $("#dirLightZ").val(this.lightDir[2])
          
-         $("#lightPosX").val(uiManager.lightPos[0])
-         $("#lightPosY").val(uiManager.lightPos[1])
-         $("#lightPosZ").val(uiManager.lightPos[2])
+         $("#lightPosX").val(this.lightPos[0])
+         $("#lightPosY").val(this.lightPos[1])
+         $("#lightPosZ").val(this.lightPos[2])
 
-         $("#gamma").val(uiManager.gamma )
-         $("#exposure").val(uiManager.exposure )
+         $("#gamma").val(this.gamma )
+         $("#exposure").val(this.exposure )
 
          $("#lightIntensity").val(this.dirLightIntensity)
 
@@ -50,6 +51,12 @@ function hexToRgb(hex) {
       g: parseInt(result[2], 16) / 255,
       b: parseInt(result[3], 16) / 255
     } : null;
+  }
+
+  function onBloomChange(e)
+  {
+    uiManager.useBloom = !uiManager.useBloom
+
   }
 
 function onLightDirectionChange(e){

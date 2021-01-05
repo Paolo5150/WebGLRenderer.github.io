@@ -39,13 +39,16 @@ function getTonemapFragment() {
     uniform float gamma;
     uniform float exposure;
     uniform sampler2D sceneTexture;
+    uniform sampler2D bloomTexture;
 
     out vec4 FragColor;
 
     void main() 
     {
         vec3 color = texture(sceneTexture, fUv).rgb * exposure;
-        float luminance = dot(color, vec3(0.2126, 0.7152, 0.0722));
+        vec3 bloom = texture(bloomTexture, vec2(fUv.x, fUv.y)).rgb ;
+        color += bloom;
+        float luminance = dot(color, vec3(0.7126, 0.7152, 0.1722));
 	    float mappedLuminance = (luminance * (1.0 + luminance/(1.0*1.0))) / (1.0 + luminance);
 
 	    vec3 mappedColor = (mappedLuminance / luminance) * color;
@@ -94,7 +97,7 @@ function getExtractBrightnessFragment() {
     {
         vec3 finalColor = texture(uSampler_1, fUv).rgb;
   
-        float brightness = dot(finalColor.rgb, vec3(0.7126, 0.7152, 0.0722));
+        float brightness = dot(finalColor.rgb, vec3(0.4126, 0.4152, 0.5722));
         if(brightness > 1.0)
             FragColor = vec4(finalColor.rgb, 1.0);
         else

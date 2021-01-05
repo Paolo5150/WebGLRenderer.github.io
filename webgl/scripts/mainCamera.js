@@ -11,14 +11,11 @@ class MainCamera
     }
 
     update(delta) {
-        if(!leftButtonDown)
-        {
-            this.cameraDistance -= mousePositionDelta[1] * delta * 10
-        }
-        else
-        {
-            this.camObj.position[1] += mousePositionDelta[1] * delta * 10
-        }
+
+        this.cameraDistance -= mousePositionDelta[1] * delta * 10
+
+        this.camObj.position[1] += upDown* delta * 10
+
     
         this.cameraAngle += mousePositionDelta[0] * delta 
     

@@ -60,7 +60,7 @@ function getTextureOnlyShaderFragment() {
         }
         else
         {
-            c = texture(image, vec2(fUv.x, 1.0 - fUv.y)).rgb;
+            c = texture(image, vec2(fUv.x,  fUv.y)).rgb;
         }
 
         myOutputColor= vec4(c, 1.0);

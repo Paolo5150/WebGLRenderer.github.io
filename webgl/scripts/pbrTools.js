@@ -24,7 +24,7 @@ class PBRTools
         this.cameras[5].view = mat4.lookAt(this.cameras[5].view, [0,0,0], [0,0,-1], [0,-1,0])
 
         this.frameBuffer = new Framebuffer(512,512)
-        this.frameBuffer.addCubeColorAttachmentFloat()
+        this.frameBuffer.addCubeColorAttachmentFloat(true)
         this.frameBuffer.addCubeDepthAttachmentFloat()
 
         this.convFBO = new Framebuffer(32,32)

@@ -71,6 +71,9 @@
         <label for="exposure" style="color: white">Exposure</label>
         <input id="exposure" type="number"  step = "0.1" min="0.1" max="5.0" value="0.8" onchange="onExposureChange()">
 
+        
+        <input type="checkbox" id="bloomCheck" name="c" onchange="onBloomChange()">
+        <label for="c"> Bloom</label><br>
       </div>
 
       <canvas id = "mycanvas" width = "1920px" height="900px"></canvas>
