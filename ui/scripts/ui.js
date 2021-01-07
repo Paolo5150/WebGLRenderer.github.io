@@ -7,9 +7,6 @@ class UIManager {
         this.lightDiffuseColor = vec3.create()
         this.lightDiffuseColor = [1,1,1]
 
-        this.lightSpecularColor = vec3.create()
-        this.lightSpecularColor = [1,1,1]
-
         this.dirLightIntensity = 0.2
 
         //Point light
@@ -91,12 +88,6 @@ function onLightDiffuseColorChange() {
     uiManager.lightDiffuseColor = [rgb.r, rgb.g, rgb.b]
 }
 
-function onLightSpecularColorChange() {
-
-    var col = $("#lightSpecColor").val()
-    var rgb = hexToRgb(col)
-    uiManager.lightSpecularColor = [rgb.r, rgb.g, rgb.b]
-}
 
 function onLightIntensityChange() {
     var i = parseFloat($("#lightIntensity").val())

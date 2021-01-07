@@ -15,13 +15,16 @@
    <script src="https://cdn.babylonjs.com/babylon.js"></script>
    <script src="https://cdn.babylonjs.com/babylon.max.js"></script>
    <script src="https://cdn.babylonjs.com/loaders/babylonjs.loaders.min.js"></script>
+   <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js" integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl" crossorigin="anonymous"></script>
    <script src="babylon.objFileLoader.js"></script>
    
 
     <link rel="apple-touch-icon" href="%PUBLIC_URL%/logo192.png" />
-
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css" integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/3.5.2/animate.min.css">
+    <link rel="stylesheet" href="css/index.css">
+
 
     <link
   rel="stylesheet"
@@ -38,42 +41,116 @@
 
     <div>
       <div style="position: absolute; padding-left: 20px; top: 50px">
-        <label for="lightDir" style="color: white">Light direction</label>
-        <input id="dirLightX" type="number"  step = "0.1" min="-1" max="1" value="0" onchange="onLightDirectionChange('x')">
-        <input id="dirLightY" type="number"  step = "0.1" min="-1" max="1" value="-1" onchange="onLightDirectionChange('y')">
-        <input id="dirLightZ" type="number"  step = "0.1" min="-1" max="1" value="-1"  onchange="onLightDirectionChange('z')">
-        <br/>
+        <p>
+          <!-- DIRECTIONAL LIGHT-->
+          <button class="btn btn-primary" type="button" data-toggle="collapse" data-target="#directionalLightBody" aria-expanded="false" aria-controls="collapseExample">
+            Directional light
+          </button>
+          <!-- POINT LIGHT-->
+          <button class="btn btn-primary" type="button" data-toggle="collapse" data-target="#pointLightBody" aria-expanded="false" aria-controls="collapseExample">
+            Point light
+          </button>
+          <!-- POST PROCESS LIGHT-->
+          <button class="btn btn-primary" type="button" data-toggle="collapse" data-target="#postProcessBody" aria-expanded="false" aria-controls="collapseExample">
+            Post process
+          </button>
+        </p>
+          <!-- DIRECTIONAL LIGHT-->
+        <div class="collapse" id="directionalLightBody">
+          <div class="collapseBody">
+            <h2 class="collapseBodyTitle">Directional Light</h2>
+            <table>
+              <tr>
+                <th style="width: 200px;">
+                  <label for="lightDir" style="color: white">Light direction</label>
+                </th>
+                <td >
+                  <input id="dirLightX" type="number"  step = "0.1" min="-1" max="1" value="0" class="singleNumberInput" onchange="onLightDirectionChange('x')">
+                  <input id="dirLightY" type="number"  step = "0.1" min="-1" max="1" value="-1" class="singleNumberInput"onchange="onLightDirectionChange('y')">
+                  <input id="dirLightZ" type="number"  step = "0.1" min="-1" max="1" value="-1" class="singleNumberInput"  onchange="onLightDirectionChange('z')">
+                </td>
+               
+              </tr>
+              <tr>
+                <th style="width: 200px;">
+                  <label for="lightDifColor" style="color: white">Light diffuse color</label>
 
-        <label for="lightDifColor" style="color: white">Light diffuse color</label>
-        <input id="lightDifColor" type="color"  value="#FFFFFF" onchange="onLightDiffuseColorChange()">
+                </th>
+                <td >
+                  <input id="lightDifColor" type="color"  value="#FFFFFF" onchange="onLightDiffuseColorChange()">
+                </td>
+              </tr>
+              <tr>
+                <th style="width: 200px;">
+                  <label for="lightIntensity" style="color: white">Light intensity</label>
+                </th>
+                <td >
+                  <input id="lightIntensity" class="singleNumberInput" type="number" step = "0.1" min="0.0" max="5.0"  onchange="onLightIntensityChange()">
+                </td>
+              </tr>
+            </table>
+          </div>
+        </div>
+          <!-- POINT LIGHT-->
+        <div class="collapse" id="pointLightBody">
+          <div class="collapseBody">
+            <h2 class="collapseBodyTitle">Point Light</h2>
 
-        <br/>
-        <label for="lightSpecColor" style="color: white">Light specular color</label>
-        <input id="lightSpecColor" type="color"  value="#FFFFFF" onchange="onLightSpecularColorChange()">
-
-        <br/>
-        <label for="lightIntensity" style="color: white">Light intensity</label>
-        <input id="lightIntensity" style="width: 50px" type="number" step = "0.1" min="0.0" max="5.0"  onchange="onLightIntensityChange()">
-        <br/>
-
-        <label for="lightPos" style="color: white">Light Position</label>
-        <input id="lightPosX" style="width: 50px" type="number"  step = "0.1"  value="0" onchange="onLightPositionChange('x')">
-        <input id="lightPosY" style="width: 50px" type="number"  step = "0.1"  value="4" onchange="onLightPositionChange('y')">
-        <input id="lightPosZ" style="width: 50px" type="number"  step = "0.1"  value="0"  onchange="onLightPositionChange('z')">
-
-        <label for="pointLightIntensity" style="color: white">Point Light intensity</label>
-        <input id="pointLightIntensity" style="width: 50px" type="number" step = "0.1" min="0.0" max="5.0" value="1.0" onchange="onPointLightIntensityChange()">
-        <br/>
-        <br/>
-        <label for="gamma" style="color: white">Gamma</label>
-        <input id="gamma" type="number"  step = "0.1" min="0.1" max="5.0" value="0.8" onchange="onGammaChange()">
-        <br/>
-        <label for="exposure" style="color: white">Exposure</label>
-        <input id="exposure" type="number"  step = "0.1" min="0.1" max="5.0" value="0.8" onchange="onExposureChange()">
-
+            <table>
+              <tr>
+                <th style="width: 200px;">
+                  <label for="lightPos" style="color: white">Light Position</label>
+                </th>
+                <td>
+                  <input id="lightPosX" class="singleNumberInput" type="number"  step = "0.1"  value="0" onchange="onLightPositionChange('x')">
+                  <input id="lightPosY" class="singleNumberInput" type="number"  step = "0.1"  value="4" onchange="onLightPositionChange('y')">
+                  <input id="lightPosZ" class="singleNumberInput" type="number"  step = "0.1"  value="0"  onchange="onLightPositionChange('z')">
+                </td>
+              </tr>
+              <tr>
+                <th style="width: 200px;">
+                  <label for="pointLightIntensity" style="color: white">Point Light intensity</label>
+                </th>
+                <td>
+                  <input id="pointLightIntensity" class="singleNumberInput" type="number" step = "0.1" min="0.0" max="5.0" value="1.0" onchange="onPointLightIntensityChange()">
+                </td>
+              </tr>
+            </table>            
+          </div>
+        </div>   
+          <!-- POST PROCESS-->
         
-        <input type="checkbox" id="bloomCheck" name="c" onchange="onBloomChange()">
-        <label for="c"> Bloom</label><br>
+        <div class="collapse" id="postProcessBody">
+          <div class="collapseBody">
+            <h2 class="collapseBodyTitle">Post process</h2>
+            <table>
+              <tr>
+                <th style="width: 200px;">
+                  <label for="gamma" style="color: white">Gamma</label>
+                </th>
+                <td>
+                  <input id="gamma" type="number"  step = "0.1" min="0.1" max="5.0" value="0.8" onchange="onGammaChange()">
+                </td>
+              </tr>
+              <tr>
+                <th style="width: 200px;">
+                  <label for="exposure" style="color: white">Exposure</label>
+                </th>
+                <td>
+                  <input id="exposure" type="number"  step = "0.1" min="0.1" max="5.0" value="0.8" onchange="onExposureChange()">
+                </td>
+              </tr>
+              <tr>
+                <th style="width: 200px;">
+                  <label for="c"> Bloom</label>
+                </th>
+                <td>
+                  <input type="checkbox" id="bloomCheck" name="c" onchange="onBloomChange()">
+                </td>
+              </tr>
+            </table>            
+          </div>
+        </div> 
       </div>
 
       <canvas id = "mycanvas" width = "1920px" height="900px"></canvas>

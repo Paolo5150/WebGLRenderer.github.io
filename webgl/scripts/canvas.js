@@ -1,5 +1,3 @@
-
-
 var canvas = document.getElementById('mycanvas');
 var gl = canvas.getContext('webgl2');
 var textureExtensions = gl.getExtension("WEBGL_draw_buffers");
@@ -19,9 +17,6 @@ BABYLON.OBJFileLoader.COMPUTE_NORMALS  = true;
 BABYLON.OBJFileLoader.OPTIMIZE_NORMALS = true;
 BABYLON.OBJFileLoader.SKIP_MATERIALS = true;
 BABYLON.OBJFileLoader.INVERT_TEXTURE_Y = false;
-
-
-
 
 //Post process framebuffers
 var regularSceneFrameBuffer = new Framebuffer(canvas.width, canvas.height)
@@ -100,22 +95,19 @@ deerMat.addFloatUniform("metallicModifier", ()=>{return 0.0})
 deerMat.addFloatUniform("roughnessModifier", ()=>{return 0.0})
 deerMat.addFloatUniform("doShadow", ()=>{return 1.0})
 
-
+let woodMat = getWoodMaterial()
+woodMat.addVec3Uniform("camPos", ()=>{return camera.camObj.position})
+woodMat.addTexture("shadowMap", directionalLight.shadowFrameBuffer.attachments['depth'])
+woodMat.addMat4Uniform("lightSpace", ()=>{return directionalLight.ligthtSpaceMatrix  })
+woodMat.addCubeMap("pShadowMap", pointlLight.shadowFrameBuffer.attachments['depth'])
 
 Texture.FromURL_HDR('https://twinkllinjeweles.000webhostapp.com/Alexs_Apt_2k.hdr', (loadedTexture)=>{
 //  textureViewer.setTexture(loadedTexture)
 
   pbrTools.renderToCubemap(renderer, 0, equirectCube, loadedTexture)
   skybox = new Skybox(pbrTools.frameBuffer.attachments['color0'], cube) //Pass the cube mesh renderer, the amterial will be overriden
-
   
 })
-
-let woodMat = getWoodMaterial()
-woodMat.addVec3Uniform("camPos", ()=>{return camera.camObj.position})
-woodMat.addTexture("shadowMap", directionalLight.shadowFrameBuffer.attachments['depth'])
-woodMat.addMat4Uniform("lightSpace", ()=>{return directionalLight.ligthtSpaceMatrix  })
-woodMat.addCubeMap("pShadowMap", pointlLight.shadowFrameBuffer.attachments['depth'])
 
 let untexturedMat = getUntexturedMaterial([1,1,1])
 untexturedMat.addMat4Uniform("lightSpace", ()=>{return directionalLight.ligthtSpaceMatrix })
@@ -157,8 +149,7 @@ loadOBJ("webgl/models/geosphere.obj").then((value) => {
         directionalLight.shadowCasters.push(meshR)
         pointlLight.shadowCasters.push(meshR)
         deer = meshR;
-      }
-        
+      }        
     }
 })
 
@@ -201,7 +192,6 @@ var render = function(time) {
     pointlLight.updateLightFromUI(uiManager)
     pointlLight.updateShadowMap(renderer, time)
 
-
     //Render scene to frame buffer
     regularSceneFrameBuffer.bind()
 
@@ -231,7 +221,7 @@ var render = function(time) {
     renderer.renderMeshRendererForceMaterial(camera.camObj,time,screenQuad, hdrPostProcessMaterial)
 
     //Texture viewer
-    renderer.renderMeshRenderer(camera.camObj,time,textureViewer.quad)
+    //renderer.renderMeshRenderer(camera.camObj,time,textureViewer.quad)
 
     window.requestAnimationFrame(render)
 }
