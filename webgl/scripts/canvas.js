@@ -101,9 +101,7 @@ woodMat.addTexture("shadowMap", directionalLight.shadowFrameBuffer.attachments['
 woodMat.addMat4Uniform("lightSpace", ()=>{return directionalLight.ligthtSpaceMatrix  })
 woodMat.addCubeMap("pShadowMap", pointlLight.shadowFrameBuffer.attachments['depth'])
 
-Texture.FromURL_HDR('https://twinkllinjeweles.000webhostapp.com/Alexs_Apt_2k.hdr', (loadedTexture)=>{
-//  textureViewer.setTexture(loadedTexture)
-
+Texture.FromURL_HDR('https://github.com/Paolo5150/WebGLRenderer.github.io/blob/master/Alexs_Apt_2k.hdr', (loadedTexture)=>{
   pbrTools.renderToCubemap(renderer, 0, equirectCube, loadedTexture)
   skybox = new Skybox(pbrTools.frameBuffer.attachments['color0'], cube) //Pass the cube mesh renderer, the amterial will be overriden
   
