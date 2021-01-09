@@ -90,7 +90,8 @@ class Texture
             secure: true,
             headers: {
               'Access-Control-Allow-Origin': 'https://paolo5150.github.io',
-              'Access-Control-Allow-Headers': 'https://paolo5150.github.io'
+              'Access-Control-Allow-Headers': 'https://paolo5150.github.io',
+              'Access-Control-Allow-Credentials': 'true'
             },
             success: function (body){
                 
