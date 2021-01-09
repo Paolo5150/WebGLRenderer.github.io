@@ -45,7 +45,10 @@ class BloomEffect
         // so i render the entire scene first with a black tint, then render the cube with the light color
         rendererObj.clearAll(0,0,0,1)
 
-
+        if(cube != null && uiManager.pLightIntensity > 0)
+        {
+            renderer.renderMeshRenderer(camera.camObj, time,cube)
+        }
         rendererObj.render(camera.camObj,time) 
 
 

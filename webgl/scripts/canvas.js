@@ -10,6 +10,7 @@ var deer = null
 var cube = null
 var skybox = null
 var equirectCube = null
+var pLightCube = null
 
 var engine = new BABYLON.Engine(canvas, true, {preserveDrawingBuffer: true, stencil: true});
 var scene = new BABYLON.Scene(engine);
@@ -125,8 +126,6 @@ loadOBJ("webgl/models/cubic.obj").then((value) => {
         meshR.rotation = [0,0,0]
         meshR.scale = [0.4,0.4,0.4]
 
-        renderer.addMeshRenderer(meshR)
-
         cube = meshR
 
         equirectCube = new MeshRenderer(value[0],null) // Material set in PBRTools
@@ -181,8 +180,10 @@ var render = function(time) {
     if(deer != null)
         deer.rotation[1] += delta * 20
 
-    if(cube != null)
+    if(cube != null && uiManager.pLightIntensity > 0)
+    {
         cube.position = uiManager.lightPos
+    }
 
     directionalLight.updateLightFromUI(uiManager)
     directionalLight.updateShadowMap(renderer, time) 
@@ -196,6 +197,10 @@ var render = function(time) {
     renderer.clearAll(0,0,0,1)   
     gl.disable(gl.CULL_FACE)
     renderer.render(camera.camObj,time)
+    if(cube != null && uiManager.pLightIntensity > 0)
+    {
+        renderer.renderMeshRenderer(camera.camObj, time,cube)
+    }
     if(skybox != null)
         skybox.render(camera.camObj, time)
   
