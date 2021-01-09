@@ -81,7 +81,7 @@ class Texture
             imageSrc: url
         }
         $.ajax({
-            url: "https://dashboard.heroku.com/apps/pf-portfolio-backend/loadImage",
+            url: "https://pf-portfolio-backend.herokuapp.com/loadImage",
             type: 'post',
             dataType: '',
             data: JSON.stringify(d),
