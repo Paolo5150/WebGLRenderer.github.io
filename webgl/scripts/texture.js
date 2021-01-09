@@ -86,7 +86,7 @@ class Texture
             dataType: '',
             data: JSON.stringify(d),
             cors: true ,
-            contentType:'application/json',
+            contentType:'jsonp',
             secure: true,
             headers: {
               'Access-Control-Allow-Origin': 'https://paolo5150.github.io',
