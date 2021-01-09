@@ -86,7 +86,7 @@ class Texture
             dataType: '',
             data: JSON.stringify(d),
             cors: true ,
-            contentType:'jsonp',
+            contentType:'application/json',
             secure: true,
             headers: {
               'Access-Control-Allow-Origin': '*',
