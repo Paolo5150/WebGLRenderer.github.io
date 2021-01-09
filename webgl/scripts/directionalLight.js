@@ -5,7 +5,7 @@ class DirectionalLight
         this.diffuseColor = vec3.create()
         this.specularColor = vec3.create()
 
-        this.shadowCameraSize = 5
+        this.shadowCameraSize = 7
         this.shadowCam = Camera.ortho(-this.shadowCameraSize,this.shadowCameraSize,-this.shadowCameraSize,this.shadowCameraSize,0.1,60)
         this.shadowCam.position = [0,0,10]
         this.shadowCam.updateView()
