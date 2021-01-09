@@ -89,7 +89,8 @@ class Texture
             contentType:'application/json',
             secure: true,
             headers: {
-              'Access-Control-Allow-Origin': 'https://paolo5150.github.io',
+              'Access-Control-Allow-Origin': '*',
+              'Access-Control-Allow-Headers': '*'
             },
             success: function (body){
                 
