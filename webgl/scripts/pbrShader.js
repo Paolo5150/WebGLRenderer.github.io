@@ -186,7 +186,7 @@ function getPBRShaderFragment() {
        
         vec3 fragToLight = fFragPos - fLightPosition;
         float currentDepth = length(fragToLight);
-        float bias = 0.001; 
+        float bias = 0.01; 
 
         float shadow = 0.0;
         float texelSize = 1.0 / 1024.0;

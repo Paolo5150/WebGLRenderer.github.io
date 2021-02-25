@@ -12,12 +12,11 @@ class MainCamera
 
     update(delta) {
 
-        this.cameraDistance -= mousePositionDelta[1] * delta * 10
+      //  this.cameraDistance -= mousePositionDelta[1] * delta * 10
 
-        this.camObj.position[1] += upDown* delta * 10
-
+        this.camObj.position[1] -= mousePositionDelta[1] / 2.0 * delta * 10
     
-        this.cameraAngle += mousePositionDelta[0] * delta 
+        this.cameraAngle += mousePositionDelta[0] / 4.0 * delta 
     
         this.camObj.position[0] = Math.cos(this.cameraAngle) * this.cameraDistance
         this.camObj.position[2] = Math.sin(this.cameraAngle) * this.cameraDistance   

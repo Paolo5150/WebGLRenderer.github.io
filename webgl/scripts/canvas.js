@@ -19,6 +19,7 @@ BABYLON.OBJFileLoader.OPTIMIZE_NORMALS = true;
 BABYLON.OBJFileLoader.SKIP_MATERIALS = true;
 BABYLON.OBJFileLoader.INVERT_TEXTURE_Y = false;
 
+
 //Post process framebuffers
 var regularSceneFrameBuffer = new Framebuffer(canvas.width, canvas.height)
 regularSceneFrameBuffer.addTextureColorAttachment( 1, gl.RGBA16F, gl.RGBA, gl.FLOAT, gl.LINEAR, gl.LINEAR, gl.REPEAT)
@@ -103,6 +104,8 @@ woodMat.addMat4Uniform("lightSpace", ()=>{return directionalLight.ligthtSpaceMat
 woodMat.addCubeMap("pShadowMap", pointlLight.shadowFrameBuffer.attachments['depth'])
 
 Texture.FromURL_HDR('https://twinkllinjeweles.000webhostapp.com/Alexs_Apt_2k.hdr', (loadedTexture)=>{
+  
+
   pbrTools.renderToCubemap(renderer, 0, equirectCube, loadedTexture)
   skybox = new Skybox(pbrTools.frameBuffer.attachments['color0'], cube) //Pass the cube mesh renderer, the amterial will be overriden
   
@@ -118,6 +121,10 @@ floor.position = [0,0,-1]
 floor.scale = [25,25,1]
 renderer.addMeshRenderer(floor)
 
+var l1 = false
+var l2 = false
+var l3 = false
+ 
 loadOBJ("webgl/models/cubic.obj").then((value) => {
     if(value != undefined)
     {
@@ -129,7 +136,7 @@ loadOBJ("webgl/models/cubic.obj").then((value) => {
         cube = meshR
 
         equirectCube = new MeshRenderer(value[0],null) // Material set in PBRTools
-
+        l1 = true
     }
 })
 
@@ -146,6 +153,7 @@ loadOBJ("webgl/models/geosphere.obj").then((value) => {
         directionalLight.shadowCasters.push(meshR)
         pointlLight.shadowCasters.push(meshR)
         deer = meshR;
+        l2 = true
       }        
     }
 })
@@ -161,24 +169,30 @@ loadOBJ("webgl/models/Deer.obj").then((value) => {
       renderer.addMeshRenderer(meshR)
       directionalLight.shadowCasters.push(meshR)
       pointlLight.shadowCasters.push(meshR)
+      l3 = true
     }
       
   }
 })
+
 
 var prev = 0;
 var now = 0
 var delta = 0
 var render = function(time) {
 
+  // Super hack: Babylon takes over all input callbacks
+  // So, after I loaded all models (with Babylone) the scene is deleted so my custom input callbacks can work
+  if(l1 && l2 && l3)
+  {
+    scene.dispose()
+  }
+
     now = time
     delta = (now - prev) * 0.001;
     prev = now
 
     camera.update(delta)
-
-    if(deer != null)
-        deer.rotation[1] += delta * 20
 
     if(cube != null && uiManager.pLightIntensity > 0)
     {

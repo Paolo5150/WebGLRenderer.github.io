@@ -5,17 +5,29 @@ var leftButtonDown = false
 var rightButtonDown = false
 var midButtonDown = false
 var moving = false
+var sensitivity = 0.5;
+
+
 $( document ).ready(function() {
 
-
+    console.log("READY")
     var clicking = false
 
-    $("#mycanvas").mouseup(function(){
-        leftButtonDown = false
-        rightButtonDown = false
-        midButtonDown = false
-    });
-      
+    $("#mycanvas").mouseup(function(e){
+
+        mousePositionDelta = [0,0]
+        clicking = false;
+    })
+
+    $("#mycanvas").mousemove(function(e){
+
+        if(clicking)
+        {
+            mousePositionDelta = [(e.pageX - mousePosition[0]) * sensitivity,(mousePosition[1] - e.pageY) * sensitivity]
+            mousePosition = [e.pageX,e.pageY]
+        }
+    })
+
     $("#mycanvas").mousedown(function(e){
         switch (e.which) {
             case 1:
@@ -23,6 +35,7 @@ $( document ).ready(function() {
                 mousePositionDelta = [0,0]
                 mousePosition = [e.pageX,e.pageY]
                 leftButtonDown = true
+                
 
                 break;
             case 2:

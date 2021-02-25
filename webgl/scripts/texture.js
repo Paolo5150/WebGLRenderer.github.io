@@ -92,9 +92,10 @@ class Texture
               'Access-Control-Allow-Origin': '*',
             },
             success: function (body){
-                
-                console.log("RECEIVED HDR, starting to parse")
-                let result = []
+                $("#userMessage").text('One moment, loading background...')
+
+                setTimeout(()=>{
+                    let result = []
                 for (var i = 0; i < body.length; i+=2)
                     result.push('0x'+body[i]+''+body[i+1])
 
@@ -120,6 +121,11 @@ class Texture
                 gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE);
                 gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
                 onLoad(t)
+                $("#userMessage").text('')
+
+
+                },500)
+                
             }
         })
 
