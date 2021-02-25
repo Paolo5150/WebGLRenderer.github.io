@@ -6,7 +6,7 @@ let renderer =  new Renderer(canvas.width, canvas.height)
 let camera = new MainCamera()
 let pbrTools = new PBRTools()
 
-var deer = null
+var sphere = null
 var cube = null
 var skybox = null
 var equirectCube = null
@@ -152,7 +152,7 @@ loadOBJ("webgl/models/geosphere.obj").then((value) => {
         renderer.addMeshRenderer(meshR)
         directionalLight.shadowCasters.push(meshR)
         pointlLight.shadowCasters.push(meshR)
-        deer = meshR;
+        sphere = meshR;
         l2 = true
       }        
     }
@@ -193,6 +193,11 @@ var render = function(time) {
     prev = now
 
     camera.update(delta)
+
+    if(sphere != null)
+    {
+        sphere.rotation[1] += 20 * delta;
+    }
 
     if(cube != null && uiManager.pLightIntensity > 0)
     {
