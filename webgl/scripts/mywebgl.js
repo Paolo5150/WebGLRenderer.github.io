@@ -1,4 +1,5 @@
 function loadAll() {
+    $.ajaxSetup({async:false});
     console.log("Loading")
     $.getScript('webgl/scripts/mesh.js');
     $.getScript('webgl/scripts/shadeUtils.js');
@@ -31,7 +32,7 @@ function loadAll() {
     $.getScript('webgl/scripts/textureViewer.js');
 
     $.getScript('webgl/scripts/canvas.js');
-
+    $.ajaxSetup({async:true});
 
 }
 
