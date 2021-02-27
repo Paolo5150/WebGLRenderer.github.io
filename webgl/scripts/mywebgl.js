@@ -1,6 +1,7 @@
 function loadAll() {
     console.log("Loading")
     $.getScript('webgl/scripts/mesh.js');
+    $.getScript('webgl/scripts/shadeUtils.js');
     $.getScript('webgl/scripts/OBJLoader.js');
     $.getScript('webgl/scripts/modelUtils.js');
     $.getScript('webgl/scripts/meshRenderer.js');
@@ -10,7 +11,6 @@ function loadAll() {
     $.getScript('webgl/scripts/hdrTools.js');
 
     $.getScript('webgl/scripts/frambuffer.js');
-    $.getScript('webgl/scripts/shadeUtils.js');
     $.getScript('webgl/scripts/material.js');
     $.getScript('webgl/scripts/renderer.js');
     $.getScript('webgl/scripts/basicShader.js');
@@ -29,6 +29,7 @@ function loadAll() {
     $.getScript('webgl/scripts/skybox.js');
     $.getScript('webgl/scripts/materialUtils.js');
     $.getScript('webgl/scripts/textureViewer.js');
+
     $.getScript('webgl/scripts/canvas.js');
 
 
