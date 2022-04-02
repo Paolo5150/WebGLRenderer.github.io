@@ -101,7 +101,7 @@ class Texture
 
                 var hdrInfo = HDRTools.RGBE_ReadHeader(result)
                 var fArray = HDRTools.RGBE_ReadPixels(result, hdrInfo)
-                console.log(hdrInfo)
+                console.log("Loader hdr image " + hdrInfo)
                 let t = new Texture()
 
                 gl.bindTexture(gl.TEXTURE_2D, t.textID);
