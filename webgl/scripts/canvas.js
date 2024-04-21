@@ -103,7 +103,7 @@ woodMat.addTexture("shadowMap", directionalLight.shadowFrameBuffer.attachments['
 woodMat.addMat4Uniform("lightSpace", ()=>{return directionalLight.ligthtSpaceMatrix  })
 woodMat.addCubeMap("pShadowMap", pointlLight.shadowFrameBuffer.attachments['depth'])
 
-Texture.FromURL_HDR('https://www.dropbox.com/scl/fi/0et6vk27zzbejydlu3qkq/Alexs_Apt_2k.hdr?rlkey=zco48gwdievfhwqjq2k8t76hy&st=yxcalhsv&dl=0', (loadedTexture)=>{
+Texture.FromURL_HDR('https://justneedthedb.000webhostapp.com/Alexs_Apt_2k.hdr', (loadedTexture)=>{
   
 
   pbrTools.renderToCubemap(renderer, 0, equirectCube, loadedTexture)
