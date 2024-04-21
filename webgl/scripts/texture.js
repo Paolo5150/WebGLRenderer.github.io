@@ -77,6 +77,7 @@ class Texture
      //onLoad, callback with the texture obj
     static FromURL_HDR(url, onLoad) {
 
+        console.log("Trying to load background...")
         var d = {
             imageSrc: url
         }
@@ -127,6 +128,7 @@ class Texture
                 },500)
                 
             }
+            
         })
 
          }
