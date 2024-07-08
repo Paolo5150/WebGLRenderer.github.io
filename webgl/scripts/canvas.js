@@ -103,7 +103,7 @@ woodMat.addTexture("shadowMap", directionalLight.shadowFrameBuffer.attachments['
 woodMat.addMat4Uniform("lightSpace", ()=>{return directionalLight.ligthtSpaceMatrix  })
 woodMat.addCubeMap("pShadowMap", pointlLight.shadowFrameBuffer.attachments['depth'])
 
-Texture.FromURL_HDR('https://github.com/Paolo5150/WebGLRenderer.github.io/blob/master/Alexs_Apt_2k.hdr', (loadedTexture)=>{
+Texture.FromURL_HDR('https://jumpshare.com/s/ku0KQity3mAE76vNb2Ew', (loadedTexture)=>{
   
 
   pbrTools.renderToCubemap(renderer, 0, equirectCube, loadedTexture)
