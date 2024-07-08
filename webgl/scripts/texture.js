@@ -127,6 +127,10 @@ class Texture
 
                 },500)
                 
+            },
+            fail: function(body)
+            {
+                $("#userMessage").text('Oh no, background failed...')
             }
             
         })
